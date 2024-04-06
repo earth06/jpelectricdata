@@ -13,9 +13,9 @@ import yaml
 import yaml.scanner
 import glob
 import argparse
+import sqlite3
 
 ROOTDIR = f"{os.path.dirname(__file__)}/.."
-
 
 class ElectricData:
     """電力需給実績を取得するクラス
@@ -34,6 +34,21 @@ class ElectricData:
                           "hokuriku": "05", "kannsai": "06", "chugoku": "07", "shikoku": "08", "kyusyu": "09"}
         with open(f"{ROOTDIR}/src/detail_demand_supply_master.yml", "tr") as f:
             self.config = yaml.safe_load(f)
+    
+    def upsert(self, df):
+        conn = sqlite3.connect(f"{ROOTDIR}/data/data.db")
+        col_names = ",".join(self.config["db_columns"])
+        values=",".join(["?"]* len(self.config["db_columns"]))
+        sql =f"""
+            INSERT OR REPLACE INTO detail_demand_supply({col_names})
+            VALUES ({values})
+        """
+        df["date_time"] = df["date_time"].dt.strftime("%Y-%m-%d %H:%M")
+        data_list=[tuple(row) for row in df[self.config["db_columns"]].values]
+        conn.executemany(sql, data_list)
+        conn.commit()
+        conn.close()
+        return 0
 
     def get_data(self, url_list, encoding="utf-8"):
         for no, url in enumerate(url_list):
@@ -107,6 +122,7 @@ class ElectricData:
         options.add_experimental_option("prefs", {"download.default_directory": downloadpath,
                                         "download.directory_upgrade": True, "download.prompt_for_download": False, })
 
+        options.add_argument('--headless=new')
         base_url = "https://setsuden.nw.tohoku-epco.co.jp/realtime_jukyu.html"
         driver = webdriver.Chrome(
             f"{ROOTDIR}/src/bin/chromedriver", options=options)
@@ -122,7 +138,7 @@ class ElectricData:
 
     def load_with_check(self, filepath, area_name, encoding):
         df = pd.read_csv(filepath, encoding=encoding, skiprows=1)
-        org_cols = self.config[area_name]
+        org_cols = self.config["original_columns"][area_name]
         # check process
         col_check = (df.columns == org_cols).sum()
         if col_check == 20:
@@ -142,38 +158,38 @@ class ElectricData:
     # 04
 
     def load_chubu(self, filepath):
-        df = self.load_with_check(filepath, "tokyo", encoding="shift-jis")
+        df = self.load_with_check(filepath, "chubu", encoding="shift-jis")
         df["date_time"] = pd.to_datetime(df["DATE"] + " " + df["TIME"])
         df["area_name"] = "chubu"
         return df
     # 05
 
     def load_hokuriku(self, filepath):
-        df = self.load_with_check(filepath, "tokyo", encoding="shift-jis")
+        df = self.load_with_check(filepath, "hokuriku", encoding="shift-jis")
         df["date_time"] = pd.to_datetime(df["DATE"] + " " + df["TIME"])
         df["area_name"] = "hokuriku"
         return df
 
     def load_kansai(self, filepath):
-        df = self.load_with_check(filepath, "tokyo", encoding="shift-jis")
+        df = self.load_with_check(filepath, "kansai", encoding="shift-jis")
         df["date_time"] = pd.to_datetime(df["DATE"] + " " + df["TIME"])
         df["area_name"] = "kansai"
         return df
 
     def load_chugoku(self, filepath):
-        df = self.load_with_check(filepath, "tokyo", encoding="shift-jis")
+        df = self.load_with_check(filepath, "chugoku", encoding="shift-jis")
         df["date_time"] = pd.to_datetime(df["DATE"] + " " + df["TIME"])
         df["area_name"] = "chugoku"
         return df
 
     def load_shikoku(self, filepath):
-        df = self.load_with_check(filepath, "tokyo", encoding="utf-8")
+        df = self.load_with_check(filepath, "shikoku", encoding="utf-8")
         df["date_time"] = pd.to_datetime(df["DATE"] + " " + df["TIME"])
         df["area_name"] = "shikoku"
         return df
 
     def load_kyusyu(self, filepath):
-        df = self.load_with_check(filepath, "tokyo", encoding="utf-8")
+        df = self.load_with_check(filepath, "kyusyu", encoding="shift-jis")
         df["date"] = pd.to_datetime(df["DATE"].astype("str"), format="%Y%m%d")
         # 24:00はTimestampに変換できないので00:00にして日付を１日進める
         idx_24h = df["TIME"] == "24:00"
@@ -189,7 +205,7 @@ class ElectricData:
     def load_tohoku(self, filepath):
         ext = os.path.splitext(filepath)
         if ext == ".zip":
-            with zipfile.ZipFile("../data/realtime_jukyu_202404_02.zip") as zf:
+            with zipfile.ZipFile(filepath) as zf:
                 filelist = zf.namelist()
                 df_list = []
                 for filename in filelist:
@@ -243,12 +259,12 @@ class ElectricData:
 
 
 if __name__ == "__main__":
-    args = argparse.ArgumentParser()
-    args.add_argument("--date", help="取得する月,指定がなければ当月を設定する")
-    args.add_argument("--file", default=None,
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--date", help="取得する月,指定がなければ当月を設定する")
+    parser.add_argument("--file", default=None,
                       help="手動でダウンロードしたファイルを指定する,またエリア名を指定する必要がある")
-    args.add_argument("--area_name", help="手動で登録する際の対象エリア名")
-
+    parser.add_argument("--area_name", help="手動で登録する際の対象エリア名")
+    args = parser.parse_args()
     if args.file is None:
         elec = ElectricData(args.date)
         elec.execute()
