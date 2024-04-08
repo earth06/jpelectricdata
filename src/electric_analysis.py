@@ -3,6 +3,8 @@ import sqlite3
 import pandas as pd
 from datetime import datetime, timedelta
 import os
+import numpy as np
+import matplotlib.patches as mpatches
 
 plt.style.use("ggplot")
 
@@ -45,21 +47,23 @@ class ElectricAnalysis:
         ]
 
     def load_demand_supply(
-        self, begin: str = None, end: str = None, ignore_pump_up=True
+        self, begin: str = None, end: str = None, ignore_negative_value=True
     ):
         if begin is None:
             begin = (datetime.today() - timedelta(days=1)).strftime("%Y-%m-%d 00:00:00")
         if end is None:
             end = datetime.today().strftime("%Y-%m-%d 23:59:59")
+        self.begin = begin
+        self.end = end
         conn = sqlite3.connect(f"{ROOTDIR}/data/data.db")
         sql = f"""
             SELECT * FROM detail_demand_supply 
-            WHERE date_time BETWEEN '{begin}' AND '{end}'
+            WHERE date_time BETWEEN '{self.begin}' AND '{self.end}'
         """
         self.df_demand = pd.read_sql(sql, conn, parse_dates=["date_time"])
-        if ignore_pump_up:
-            self.df_demand["pumping_up"] = self.df_demand["pumping_up"].where(
-                self.df_demand["pumping_up"] >= 0, 0
+        if ignore_negative_value:
+            self.df_demand[self.labels] = self.df_demand[self.labels].where(
+                self.df_demand[self.labels] >= 0, 0
             )
         conn.close()
         return
@@ -72,4 +76,35 @@ class ElectricAnalysis:
         tmp["area_demand"].plot(c="k", ax=ax)
         # 右上
         ax.legend(loc="upper left", bbox_to_anchor=(1.01, 0.9, 0.2, 0.1))
+        return fig, ax
+
+    def plot_all_demand_supply(self, figsize=(16, 12), save=True):
+        fig = plt.figure(figsize=figsize)
+        ax = np.zeros(9, dtype=np.object_)
+        area_names = self.df_demand["area_name"].unique()
+        for i, area_name in enumerate(area_names):
+            ax[i] = fig.add_subplot(3, 3, i + 1)
+            tmp = self.df_demand.query(f"area_name=='{area_name}'").copy()
+            tmp.index = pd.to_datetime(tmp["date_time"])
+            tmp[self.labels].plot(
+                kind="area", color=self.colors, ax=ax[i], legend=False, alpha=0.8
+            )
+            tmp["area_demand"].plot(c="k", ax=ax[i], legend=False)
+            ax[i].set_xlabel("")
+            ax[i].set_title(area_name)
+            ax[i].grid(axis="x", which="minor", zorder=-1)
+            ax[i].set_ylabel("[MW]")
+            ax[i].set_xlim(self.begin, self.end)
+
+        # 凡例
+        patches = [
+            mpatches.Patch(color=color, label=label)
+            for color, label in zip(self.colors, self.labels)
+        ]
+        fig.legend(
+            handles=patches, loc="upper left", bbox_to_anchor=(0.9, 0.8, 0.2, 0.1)
+        )
+        fig.subplots_adjust(hspace=0.25)
+        if save:
+            fig.savefig(f"{ROOTDIR}/example/all_area_demand_supply.jpg", bbox_inches="tihght")
         return fig, ax
