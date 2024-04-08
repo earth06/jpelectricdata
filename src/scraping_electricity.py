@@ -319,6 +319,6 @@ if __name__ == "__main__":
         elec.execute()
     else:
         elec = ElectricData
-        df = elec.load_manually(args.area_name)
+        df = elec.load_manually(args.file, args.area_name)
         elec.upsert(df)
         # upsert処理
