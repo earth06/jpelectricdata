@@ -25,7 +25,7 @@ class ElectricData:
         Args:
             target_date (str, optional): 取得するデータの年月,指定がなければ当月をとる. Defaults to None.
         """
-        self.LIMIT = 10
+        self.LIMIT = 5
         self.OUTDIR = f"{ROOTDIR}/data"
         if target_date is None:
             self.target_date = datetime.today()
@@ -34,7 +34,7 @@ class ElectricData:
         self.yyyymm_s = [
             t.strftime("%Y%m")
             for t in pd.date_range(
-                self.target_date - pd.offsets.MonthBegin(10),
+                self.target_date - pd.offsets.MonthBegin(self.LIMIT),
                 self.target_date,
                 freq="MS",
             )[::-1]
@@ -306,7 +306,7 @@ class ElectricData:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--date", help="取得する月,指定がなければ当月を設定する")
+    parser.add_argument("--date", help="取得する月,指定がなければ当月を設定する('yyyy-mm')")
     parser.add_argument(
         "--file",
         default=None,
