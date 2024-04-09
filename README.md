@@ -17,6 +17,14 @@ cd jpelectricdata
 ./setup.sh
 ```
 
+3. chromedriverの配置
+
+以下からchromedriverをダウンロード
+https://googlechromelabs.github.io/chrome-for-testing/
+
+```bash
+mv chromedriver jpelectricdata/src/bin
+```
 
 
 ## Usage
