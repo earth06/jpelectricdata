@@ -62,8 +62,7 @@ class ElectricData:
             VALUES ({values})
         """
         df["date_time"] = df["date_time"].dt.strftime("%Y-%m-%d %H:%M")
-        data_list = [tuple(row)
-                     for row in df[self.config["db_columns"]].values]
+        data_list = [tuple(row) for row in df[self.config["db_columns"]].values]
         conn.executemany(sql, data_list)
         conn.commit()
         conn.close()
@@ -86,7 +85,9 @@ class ElectricData:
 
     def get_hokuden(self):
         yyyymmdd = (self.target_date - pd.offsets.Day(1)).strftime("%Y%m%d")
-        base_url = f"https://denkiyoho.hepco.co.jp/area/data/{yyyymmdd}_hokkaido_jukyu.csv"
+        base_url = (
+            f"https://denkiyoho.hepco.co.jp/area/data/{yyyymmdd}_hokkaido_jukyu.csv"
+        )
         filepath = self.get_data([base_url], encoding="shift-jis")
         return filepath
 
@@ -162,8 +163,7 @@ class ElectricData:
 
         options.add_argument("--headless=new")
         base_url = "https://setsuden.nw.tohoku-epco.co.jp/realtime_jukyu.html"
-        driver = webdriver.Chrome(
-            f"{ROOTDIR}/src/bin/chromedriver", options=options)
+        driver = webdriver.Chrome(f"{ROOTDIR}/src/bin/chromedriver", options=options)
         driver.get(base_url)
         sleep(2)
         for text in ["今月分実績ダウンロード", "先月分実績ダウンロード"]:
@@ -171,7 +171,7 @@ class ElectricData:
             sleep(2)
             element.click()
         driver.quit()
-        filepath = sorted(glob.glob(f"{ROOTDIR}/data/**02.zip*"))[0]
+        filepath = sorted(glob.glob(f"{ROOTDIR}/data/**02.zip*"))[0:2]
         return filepath
 
     def load_with_check(self, filepath, area_name, encoding, skiprows=1):
@@ -189,10 +189,12 @@ class ElectricData:
 
     def load_hokkaido(self, filepath):
         df = self.load_with_check(
-            filepath, "hokkaido", encoding="shift-jis", skiprows=2).loc[1:]
+            filepath, "hokkaido", encoding="shift-jis", skiprows=2
+        ).loc[1:]
         df["TIME"] = df["TIME"].str.split("〜").apply(lambda x: x[0])
         df["date_time"] = pd.to_datetime(
-            df["DATE"]+" "+df["TIME"], format="%Y/%m/%d %H:%M")
+            df["DATE"] + " " + df["TIME"], format="%Y/%m/%d %H:%M"
+        )
         df["area_name"] = "hokkaido"
         return df
 
@@ -236,7 +238,7 @@ class ElectricData:
         df = self.load_with_check(filepath, "kyusyu", encoding="shift-jis")
         df["date"] = pd.to_datetime(df["DATE"].astype("str"), format="%Y%m%d")
         # 24:00はTimestampに変換できないので00:00にして日付を１日進める
-        idx_24h = (df["TIME"] == "24:00") | (df["TIME"]=="24:00:00")
+        idx_24h = (df["TIME"] == "24:00") | (df["TIME"] == "24:00:00")
         df.loc[idx_24h, "date"] = df.loc[idx_24h, "date"] + pd.offsets.Day(1)
         df.loc[idx_24h, "TIME"] = "00:00"
         df["date_time"] = pd.to_datetime(
@@ -256,8 +258,7 @@ class ElectricData:
                 for filename in filelist:
                     with zf.open(filename) as f:
                         df_list.append(
-                            self.load_with_check(
-                                f, "tohoku", encoding="shift-jis")
+                            self.load_with_check(f, "tohoku", encoding="shift-jis")
                         )
             df = pd.concat(df_list)
         else:
@@ -295,8 +296,13 @@ class ElectricData:
             try:
                 print(i)
                 filepath = get_method()
-                df = load_method(filepath)
-                self.upsert(df)
+                if type(filepath) is list:
+                    for f in filepath:
+                        df = load_method(f)
+                        self.upsert(df)
+                else:
+                    df = load_method(filepath)
+                    self.upsert(df)
                 # DB登録の処理
             except Exception:
                 print(traceback.format_exc())
@@ -328,7 +334,9 @@ class ElectricData:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--date", help="取得する月,指定がなければ当月を設定する('yyyy-mm')")
+    parser.add_argument(
+        "--date", help="取得する月,指定がなければ当月を設定する('yyyy-mm')"
+    )
     parser.add_argument(
         "--file",
         default=None,
@@ -340,7 +348,7 @@ if __name__ == "__main__":
         elec = ElectricData(args.date)
         elec.execute()
     else:
-        elec = ElectricData()
+        elec = ElectricData
         df = elec.load_manually(args.file, args.area_name)
         elec.upsert(df)
         # upsert処理
