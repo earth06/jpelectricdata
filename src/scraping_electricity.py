@@ -25,7 +25,7 @@ class ElectricData:
         Args:
             target_date (str, optional): 取得するデータの年月,指定がなければ当月をとる. Defaults to None.
         """
-        self.LIMIT = 5
+        self.LIMIT = 2
         self.OUTDIR = f"{ROOTDIR}/data"
         if target_date is None:
             self.target_date = datetime.today()
@@ -190,9 +190,9 @@ class ElectricData:
     def load_hokkaido(self, filepath):
         df = self.load_with_check(
             filepath, "hokkaido", encoding="shift-jis", skiprows=2).loc[1:]
-        df["TIME"] = df["時刻"].str.split("〜").apply(lambda x: x[0])
+        df["TIME"] = df["TIME"].str.split("〜").apply(lambda x: x[0])
         df["date_time"] = pd.to_datetime(
-            df["年月日"]+" "+df["TIME"], format="%Y/%m/%d %H:%M")
+            df["DATE"]+" "+df["TIME"], format="%Y/%m/%d %H:%M")
         df["area_name"] = "hokkaido"
         return df
 
@@ -236,7 +236,7 @@ class ElectricData:
         df = self.load_with_check(filepath, "kyusyu", encoding="shift-jis")
         df["date"] = pd.to_datetime(df["DATE"].astype("str"), format="%Y%m%d")
         # 24:00はTimestampに変換できないので00:00にして日付を１日進める
-        idx_24h = df["TIME"] == "24:00"
+        idx_24h = (df["TIME"] == "24:00") | (df["TIME"]=="24:00:00")
         df.loc[idx_24h, "date"] = df.loc[idx_24h, "date"] + pd.offsets.Day(1)
         df.loc[idx_24h, "TIME"] = "00:00"
         df["date_time"] = pd.to_datetime(

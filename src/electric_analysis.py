@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 import os
 import numpy as np
 import matplotlib.patches as mpatches
+import argparse
 
 plt.style.use("ggplot")
 
@@ -106,5 +107,16 @@ class ElectricAnalysis:
         )
         fig.subplots_adjust(hspace=0.25)
         if save:
-            fig.savefig(f"{ROOTDIR}/example/all_area_demand_supply.jpg", bbox_inches="tihght")
+            fig.savefig(f"{ROOTDIR}/example/all_area_demand_supply.jpg", bbox_inches="tight")
         return fig, ax
+
+if __name__=="__main__":
+    import matplotlib
+    matplotlib.use("Agg")
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--begin", default=None, help="plot begin YYYY-MM-DD")
+    parser.add_argument("--end", default=None, help="plot end YYYY-MM-DD")
+    args = parser.parse_args()
+    elec = ElectricAnalysis()
+    elec.load_demand_supply(begin=args.begin, end=args.end)
+    elec.plot_all_demand_supply()
