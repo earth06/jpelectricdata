@@ -62,7 +62,8 @@ class ElectricData:
             VALUES ({values})
         """
         df["date_time"] = df["date_time"].dt.strftime("%Y-%m-%d %H:%M")
-        data_list = [tuple(row) for row in df[self.config["db_columns"]].values]
+        data_list = [tuple(row)
+                     for row in df[self.config["db_columns"]].values]
         conn.executemany(sql, data_list)
         conn.commit()
         conn.close()
@@ -82,6 +83,12 @@ class ElectricData:
                 return filepath
             sleep(1)
         return None
+
+    def get_hokuden(self):
+        yyyymmdd = (self.target_date - pd.offsets.Day(1)).strftime("%Y%m%d")
+        base_url = f"https://denkiyoho.hepco.co.jp/area/data/{yyyymmdd}_hokkaido_jukyu.csv"
+        filepath = self.get_data([base_url], encoding="shift-jis")
+        return filepath
 
     def get_chuden(self):
         base_url = "https://powergrid.chuden.co.jp/denki_yoho_content_data"
@@ -155,7 +162,8 @@ class ElectricData:
 
         options.add_argument("--headless=new")
         base_url = "https://setsuden.nw.tohoku-epco.co.jp/realtime_jukyu.html"
-        driver = webdriver.Chrome(f"{ROOTDIR}/src/bin/chromedriver", options=options)
+        driver = webdriver.Chrome(
+            f"{ROOTDIR}/src/bin/chromedriver", options=options)
         driver.get(base_url)
         sleep(2)
         for text in ["今月分実績ダウンロード", "先月分実績ダウンロード"]:
@@ -166,8 +174,8 @@ class ElectricData:
         filepath = sorted(glob.glob(f"{ROOTDIR}/data/**02.zip*"))[0]
         return filepath
 
-    def load_with_check(self, filepath, area_name, encoding):
-        df = pd.read_csv(filepath, encoding=encoding, skiprows=1)
+    def load_with_check(self, filepath, area_name, encoding, skiprows=1):
+        df = pd.read_csv(filepath, encoding=encoding, skiprows=skiprows)
         org_cols = self.config["original_columns"][area_name]
         # check process
         col_check = (df.columns == org_cols).sum()
@@ -178,6 +186,15 @@ class ElectricData:
             print("original:", org_cols, "current:", df.columns)
             raise
         return None
+
+    def load_hokkaido(self, filepath):
+        df = self.load_with_check(
+            filepath, "hokkaido", encoding="shift-jis", skiprows=2).loc[1:]
+        df["TIME"] = df["時刻"].str.split("〜").apply(lambda x: x[0])
+        df["date_time"] = pd.to_datetime(
+            df["年月日"]+" "+df["TIME"], format="%Y/%m/%d %H:%M")
+        df["area_name"] = "hokkaido"
+        return df
 
     def load_tokyo(self, filepath):
         df = self.load_with_check(filepath, "tokyo", encoding="utf-8")
@@ -239,7 +256,8 @@ class ElectricData:
                 for filename in filelist:
                     with zf.open(filename) as f:
                         df_list.append(
-                            self.load_with_check(f, "tohoku", encoding="shift-jis")
+                            self.load_with_check(
+                                f, "tohoku", encoding="shift-jis")
                         )
             df = pd.concat(df_list)
         else:
@@ -250,6 +268,7 @@ class ElectricData:
 
     def execute(self):
         get_methods = [
+            self.get_hokuden,
             self.get_tohokuden,
             self.get_touden,
             self.get_chuden,
@@ -261,6 +280,7 @@ class ElectricData:
         ]
 
         load_methods = [
+            self.load_hokkaido,
             self.load_tohoku,
             self.load_tokyo,
             self.load_chubu,
@@ -299,6 +319,8 @@ class ElectricData:
             df = self.load_shikoku(filepath)
         elif area_name == "kyusyu":
             df = self.load_kyusyu(filepath)
+        elif area_name == "hokkaido":
+            df = self.load_hokkaido(filepath)
         else:
             raise
         return df
