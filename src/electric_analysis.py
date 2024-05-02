@@ -69,7 +69,7 @@ class ElectricAnalysis:
         conn.close()
         return
 
-    def plot_demand_supply(self, area_name="chubu", figsize=(16, 5)):
+    def plot_demand_supply(self, area_name="chubu", figsize=(18, 8)):
         fig, ax = plt.subplots(figsize=figsize)
         tmp = self.df_demand.query(f"area_name=='{area_name}'").copy()
         tmp.index = pd.to_datetime(tmp["date_time"])
