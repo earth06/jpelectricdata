@@ -340,7 +340,7 @@ if __name__ == "__main__":
         elec = ElectricData(args.date)
         elec.execute()
     else:
-        elec = ElectricData
+        elec = ElectricData()
         df = elec.load_manually(args.file, args.area_name)
         elec.upsert(df)
         # upsert処理
