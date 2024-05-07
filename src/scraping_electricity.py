@@ -163,15 +163,24 @@ class ElectricData:
 
         options.add_argument("--headless=new")
         base_url = "https://setsuden.nw.tohoku-epco.co.jp/realtime_jukyu.html"
-        driver = webdriver.Chrome(f"{ROOTDIR}/src/bin/chromedriver", options=options)
-        driver.get(base_url)
+
         sleep(2)
-        for text in ["今月分実績ダウンロード", "先月分実績ダウンロード"]:
+        for text in ["先月分実績ダウンロード", "今月分実績ダウンロード"]:
+            driver = webdriver.Chrome(
+                f"{ROOTDIR}/src/bin/chromedriver", options=options
+            )
+            driver.get(base_url)
             element = driver.find_element_by_partial_link_text(text)
             sleep(2)
             element.click()
-        driver.quit()
-        filepath = sorted(glob.glob(f"{ROOTDIR}/data/**02.zip*"))[0:2]
+            sleep(5)
+            driver.quit()
+        filepath = sorted(
+            glob.glob(f"{ROOTDIR}/data/**02*zip*"),
+            key=lambda f: os.stat(f).st_mtime,
+            reverse=True,
+        )[0]
+        print(filepath)
         return filepath
 
     def load_with_check(self, filepath, area_name, encoding, skiprows=1):
