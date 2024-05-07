@@ -1,8 +1,9 @@
-#! /bin/bash
+#! /bin/bash -l
 
-PYTHON="xxxxx"
+PYTHON="/home/takato/miniforge3/envs/pi/bin/python"
 
 SCRIPT_DIR=$(cd $(dirname $0); pwd -P)  
+cd $SCRIPT_DIR
 
-python scraping_electricity.py
-python send_to_bluesky.py
+$PYTHON scraping_electricity.py > /dev/null 2>&1 
+$PYTHON send_to_bluesky.py > /dev/null 2>&1 
