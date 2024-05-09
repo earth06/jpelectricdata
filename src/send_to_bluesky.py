@@ -21,4 +21,4 @@ client.login(BSKY_ID, BSKY_PASS)
 
 with open("../example/all_area_demand_supply.jpg", "br") as f:
     img = f.read()
-client.send_image("電力需給", img, "demand_supply")
+client.send_image("過去1週間のエリア別電力需給実績速報値", img, "demand_supply")
