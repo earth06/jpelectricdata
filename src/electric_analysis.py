@@ -124,7 +124,7 @@ class ElectricAnalysis:
         ax.legend(loc="upper left", bbox_to_anchor=(1.01, 0.9, 0.2, 0.1))
         return fig, ax
 
-    def plot_all_demand_supply(self, figsize=(16, 12), save=True):
+    def plot_all_demand_supply(self, figsize=(16, 13), save=True):
         fig = plt.figure(figsize=figsize)
         ax = np.zeros(9, dtype=np.object_)
         area_names = self.df_demand["area_name"].unique()
@@ -149,6 +149,10 @@ class ElectricAnalysis:
             ax[i].grid(axis="x", which="minor", zorder=-1)
             ax[i].set_ylabel("[MW]")
             ax[i].set_xlim(self.begin, self.end)
+            if i < 6:
+                ax[i].tick_params(labelbottom=False)
+            if i % 3 != 0:
+                ax[i].set_ylabel("")
 
         # 凡例
         patches = [
@@ -158,6 +162,7 @@ class ElectricAnalysis:
         fig.legend(
             handles=patches, loc="upper left", bbox_to_anchor=(0.9, 0.8, 0.2, 0.1)
         )
+        fig.suptitle("エリア需給実績速報値")
         fig.subplots_adjust(hspace=0.25)
         if save:
             fig.savefig(
