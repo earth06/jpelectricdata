@@ -1,66 +1,223 @@
 <!DOCTYPE html>
+<html lang="ja">
 <head>
+    <meta charset="UTF-8">
     <title>電力需給エリア当てクイズ</title>
+    <style>
+        .image-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .image-box {
+            text-align: center;
+        }
+        .image-box img {
+            width: 100%;
+            height: auto;
+        }
+        details {
+            margin-top: 5px;
+        }
+    </style>
 </head>
 <body>
+    <img src="./example/legends.jpg">
+    <div class="image-container">
+        <!-- 画像とドロップダウン、detailsタグを9つ配置 -->
+        <!-- 1-->
+        <div class="image-box">
+            <img src="./example/tokyo.jpg" alt="Image 1">
+            <select id="dropdown1">
+                <option value="北海道">北海道</option>
+                <option value="東北">東北</option>
+                <option value="東京">東京</option>
+                <option value="中部">中部</option>
+                <option value="北陸">北陸</option>
+                <option value="関西">関西</option>
+                <option value="中国">中国</option>
+                <option value="四国">四国</option>
+                <option value="九州">九州</option>
+            </select>
+            <details>
+                <summary>正解</summary>
+                <span>東京</span>
+            </details>
+        </div>
+        <!-- 2 -->
+        <div class="image-box">
+          <img src="./example/chubu.jpg" alt="Image 1">
+          <select id="dropdown1">
+              <option value="北海道">北海道</option>
+              <option value="東北">東北</option>
+              <option value="東京">東京</option>
+              <option value="中部">中部</option>
+              <option value="北陸">北陸</option>
+              <option value="関西">関西</option>
+              <option value="中国">中国</option>
+              <option value="四国">四国</option>
+              <option value="九州">九州</option>
+          </select>
+          <details>
+              <summary>正解</summary>
+              <span>中部</span>
+          </details>
+      </div>
+      <!-- 3 -->
+      <div class="image-box">
+        <img src="./example/hokkaido.jpg" alt="Image 1">
+        <select id="dropdown1">
+            <option value="北海道">北海道</option>
+            <option value="東北">東北</option>
+            <option value="東京">東京</option>
+            <option value="中部">中部</option>
+            <option value="北陸">北陸</option>
+            <option value="関西">関西</option>
+            <option value="中国">中国</option>
+            <option value="四国">四国</option>
+            <option value="九州">九州</option>
+        </select>
+        <details>
+            <summary>正解</summary>
+            <span>北海道</span>
+        </details>
+      </div>
+      <!-- 4 -->
+      <div class="image-box">
+        <img src="./example/kyusyu.jpg" alt="Image 1">
+        <select id="dropdown1">
+            <option value="北海道">北海道</option>
+            <option value="東北">東北</option>
+            <option value="東京">東京</option>
+            <option value="中部">中部</option>
+            <option value="北陸">北陸</option>
+            <option value="関西">関西</option>
+            <option value="中国">中国</option>
+            <option value="四国">四国</option>
+            <option value="九州">九州</option>
+        </select>
+        <details>
+            <summary>正解</summary>
+            <span>九州</span>
+        </details>
+      </div>
+      <!-- 5 -->
+      <div class="image-box">
+        <img src="./example/chugoku.jpg" alt="Image 1">
+        <select id="dropdown1">
+            <option value="北海道">北海道</option>
+            <option value="東北">東北</option>
+            <option value="東京">東京</option>
+            <option value="中部">中部</option>
+            <option value="北陸">北陸</option>
+            <option value="関西">関西</option>
+            <option value="中国">中国</option>
+            <option value="四国">四国</option>
+            <option value="九州">九州</option>
+        </select>
+        <details>
+            <summary>正解</summary>
+            <span>中国</span>
+        </details>
+      </div>
+      <!-- 6 -->
+      <div class="image-box">
+        <img src="./example/shikoku.jpg" alt="Image 1">
+        <select id="dropdown1">
+            <option value="北海道">北海道</option>
+            <option value="東北">東北</option>
+            <option value="東京">東京</option>
+            <option value="中部">中部</option>
+            <option value="北陸">北陸</option>
+            <option value="関西">関西</option>
+            <option value="中国">中国</option>
+            <option value="四国">四国</option>
+            <option value="九州">九州</option>
+        </select>
+        <details>
+            <summary>正解</summary>
+            <span>四国</span>
+        </details>
+      </div>
+      <!-- 7 -->
+      <div class="image-box">
+        <img src="./example/kansai.jpg" alt="Image 1">
+        <select id="dropdown1">
+            <option value="北海道">北海道</option>
+            <option value="東北">東北</option>
+            <option value="東京">東京</option>
+            <option value="中部">中部</option>
+            <option value="北陸">北陸</option>
+            <option value="関西">関西</option>
+            <option value="中国">中国</option>
+            <option value="四国">四国</option>
+            <option value="九州">九州</option>
+        </select>
+        <details>
+            <summary>正解</summary>
+            <span>関西</span>
+        </details>
+      </div>
+      <!-- 8 -->
+      <div class="image-box">
+        <img src="./example/hokuriku.jpg" alt="Image 1">
+        <select id="dropdown1">
+            <option value="北海道">北海道</option>
+            <option value="東北">東北</option>
+            <option value="東京">東京</option>
+            <option value="中部">中部</option>
+            <option value="北陸">北陸</option>
+            <option value="関西">関西</option>
+            <option value="中国">中国</option>
+            <option value="四国">四国</option>
+            <option value="九州">九州</option>
+        </select>
+        <details>
+            <summary>正解</summary>
+            <span>北陸</span>
+        </details>
+      </div>
+
+      <!-- 9 -->
+      <div class="image-box">
+        <img src="./example/tohoku.jpg" alt="Image 1">
+        <select id="dropdown1">
+            <option value="北海道">北海道</option>
+            <option value="東北">東北</option>
+            <option value="東京">東京</option>
+            <option value="中部">中部</option>
+            <option value="北陸">北陸</option>
+            <option value="関西">関西</option>
+            <option value="中国">中国</option>
+            <option value="四国">四国</option>
+            <option value="九州">九州</option>
+        </select>
+        <details>
+            <summary>正解</summary>
+            <span>東北</span>
+        </details>
+      </div>
+
+    </div>
 
 
-<img src="./example/chubu.jpg">
-<details>
-  <summary>答え</summary>
-  中部
-</details>
 
-<img src="./example/tokyo.jpg">
-<details>
-  <summary>答え</summary>
-  東京
-</details>
-
-
-<img src="./example/kansai.jpg">
-<details>
-  <summary>答え</summary>
-  関西
-</details>
-
-
-<img src="./example/chugoku.jpg">
-<details>
-  <summary>答え</summary>
-  中国
-</details>
-
-<img src="./example/shikoku.jpg">
-<details>
-  <summary>答え</summary>
-  四国
-</details>
-
-<img src="./example/kyusyu.jpg">
-<details>
-  <summary>答え</summary>
-  九州
-</details>
-
-<img src="./example/tohoku.jpg">
-<details>
-  <summary>答え</summary>
-  東北
-</details>
-
-<img src="./example/hokuriku.jpg">
-<details>
-  <summary>答え</summary>
-  北陸
-</details>
-
-<img src="./example/hokkaido.jpg">
-<details>
-  <summary>答え</summary>
-  北海道
-</details>
-
-
-
+    <button onclick="gradeImages()">採点</button>
+    <div id="result"></div>
+    <script>
+        function gradeImages() {
+            let score = 0;
+            const imageBoxes = document.querySelectorAll('.image-box');
+            imageBoxes.forEach((box, index) => {
+                const dropdown = box.querySelector('select');
+                const correctAnswer = box.querySelector('details span').textContent.trim();
+                if (dropdown.value === correctAnswer) {
+                    score++;
+                }
+            });
+            document.getElementById('result').innerHTML = '正答数: ' + score + '/' + imageBoxes.length;
+        }
+    </script>
 </body>
+</html>
