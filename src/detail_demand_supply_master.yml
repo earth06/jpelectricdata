@@ -35,6 +35,14 @@ original_columns:
        '火力(その他)', '水力', '地熱', 'バイオマス', '太陽光発電実績', '太陽光出力制御量', '風力発電実績',
        '風力出力制御量', '揚水', '蓄電池', '連系線', 'その他', '合計']
 
+  spot_price: [ "受渡日","時刻コード売り入札量(kWh)","買い入札量(kWh)","約定総量(kWh)",
+                  "システムプライス(円/kWh)", "エリアプライス北海道(円/kWh)","エリアプライス東北(円/kWh)",
+                  "エリアプライス東京(円/kWh)", "エリアプライス中部(円/kWh)","エリアプライス北陸(円/kWh)",
+                  "エリアプライス関西(円/kWh)", "エリアプライス中国(円/kWh)","エリアプライス四国(円/kWh)",
+                  "エリアプライス九州(円/kWh)", "売りブロック入札総量(kWh)","売りブロック約定総量(kWh)",
+                  "買いブロック入札総量(kWh)","買いブロック約定総量(kWh)"
+]
+
 #処理しやすいように全エリアのカラム名を統一する
 common_columns: ["DATE","TIME","area_demand","nuclear", "thermal_lng", "thermal_coal", "thermal_oil",
             "thermal_others", "hydropower", "geothermal", "biomass", "solarpower", "soloarcontrol","windpower",
@@ -44,3 +52,12 @@ common_columns: ["DATE","TIME","area_demand","nuclear", "thermal_lng", "thermal_
 db_columns: ["date_time","area_name","area_demand","nuclear", "thermal_lng", "thermal_coal", "thermal_oil",
             "thermal_others", "hydropower", "geothermal", "biomass", "solarpower", "soloarcontrol","windpower",
             "windcontrol", "pumping_up", "battery", "connector","others", "total"]
+
+spot_columns: ["date_time","slot","sell_amount","buy_amount", "contract_amount",
+            "system_price","area_price_hokkaido","area_price_tohoku", "area_price_tokyo",
+            "area_price_chubu", "area_price_hokuriku", "area_price_kansai", "area_price_chugoku",
+            "area_price_shikoku", "area_price_kyusyu",
+            "sell_block_amount", "sell_block_contract_amount",
+            "buy_block_amount", "buy_block_contract_amount"
+
+]
