@@ -108,7 +108,23 @@ class ElectricAnalysis:
         conn.close()
         return
 
-    def plot_demand_supply(self, area_name="chubu", figsize=(18, 8)):
+    def load_spot_price(self, begin: str = None, end: str = None):
+        if begin is None:
+            begin = (datetime.today() - timedelta(days=1)).strftime("%Y-%m-%d 00:00:00")
+        if end is None:
+            end = datetime.today().strftime("%Y-%m-%d 23:59:59")
+        self.begin = begin
+        self.end = end
+        conn = sqlite3.connect(f"{ROOTDIR}/data/data.db")
+        sql = f"""
+            SELECT * FROM spot_price 
+            WHERE date_time BETWEEN '{self.begin}' AND '{self.end}'
+        """
+        self.df_jepx = pd.read_sql(sql, conn, parse_dates=["date_time"])
+        conn.close()
+        return 
+
+    def plot_demand_supply(self, area_name="chubu", figsize=(18, 8), legend=True, alpha=1):
         fig, ax = plt.subplots(figsize=figsize)
         tmp = self.df_demand.query(f"area_name=='{area_name}'").copy()
         tmp.index = pd.to_datetime(tmp["date_time"])
@@ -118,10 +134,11 @@ class ElectricAnalysis:
             },
             inplace=True,
         )
-        tmp[self.jplabels].plot(kind="area", color=self.colors, ax=ax)
-        tmp["area_demand"].plot(c="k", ax=ax)
+        tmp[self.jplabels].plot(kind="area", color=self.colors, ax=ax,legend=False, alpha=alpha)
+        tmp["area_demand"].plot(c="r", ax=ax, legend=False, marker=".")
         # 右上
-        ax.legend(loc="upper left", bbox_to_anchor=(1.01, 0.9, 0.2, 0.1))
+        if legend:
+            ax.legend(loc="upper left", bbox_to_anchor=(1.01, 0.9, 0.2, 0.1))
         return fig, ax
 
     def plot_all_demand_supply(self, figsize=(16, 13), save=True):
