@@ -1,3 +1,4 @@
+import argparse
 import pandas as pd
 import dash
 import dash_bootstrap_components as dbc
@@ -33,9 +34,15 @@ def download_data():
     s_end = pd.to_datetime(end, format="%Y%m%d").strftime("%Y-%m-%d 23:59")
     print(s_begin, s_end)
     df = reader.read_spot_price(s_begin, s_end)
-    return jsonify(df[["date_time", "area_price_chubu"]].to_dict()) 
+    return jsonify(df[["date_time", "area_price_chubu"]].to_dict())
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--host", default="127.0.0.1")
+    parser.add_argument("--port", default=8050)
+    parser.add_argument("--debug", action="store_true")
+    args = parser.parse_args()
+    app.run(host=args.host, port=args.port, debug=args.debug)
+
     # app.run_server(mode="inline") #jupyter
