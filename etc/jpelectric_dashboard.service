@@ -1,0 +1,10 @@
+[Unit]
+Description=run japan electric market and demand supply dash board
+
+[Service]
+ExecStart=/home/takato/Git/jpelectricdata/run_server.sh
+ExecStop=/bin/kill ${MAINPID}
+Restart=on-success
+
+[Install]
+WantedBy=default.target
