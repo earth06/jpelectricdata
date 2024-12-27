@@ -17,7 +17,7 @@ dash.register_page(__name__, path="/")
 fig = px.line(x=[1, 2, 3], y=[1, 2, 3])
 layout = html.Div(
     children=[
-        html.H1(children="電力需給DashBoard"),
+        html.H2(children="市場価格と全エリアの需給"),
         # 期間の設定
         html.Div(
             children=[
@@ -44,8 +44,8 @@ layout = html.Div(
                 # dcc.Checklist(config.areas, ["chubu"], inline=True),
                 "需給項目:",
                 dcc.Dropdown(
-                    config.demand_supply_names,
-                    "area_demand",
+                    options=config.demand_supply2_jpnames,
+                    value="area_demand",
                     id="demand_supply_selector",
                 ),
             ]
@@ -75,6 +75,8 @@ def update_demand_graph(base_date, dem_sup_col):
         color="area_name",
     )
     config.format_legend(fig)
+    col = config.demand_supply2_jpnames[dem_sup_col]
+    fig.update_layout(title=f"{col}")
 
     return fig
 

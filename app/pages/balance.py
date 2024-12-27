@@ -4,7 +4,7 @@ import dash
 from dash import dcc, html, callback
 from dash import Input, Output
 import plotly.express as px
-
+import plotly.graph_objects as go
 from datareader import DataReader
 from pages.common import Config
 
@@ -18,7 +18,7 @@ dash.register_page(__name__)
 fig = px.line(x=[1, 2, 3], y=[1, 2, 3])
 layout = html.Div(
     children=[
-        html.H1(children="Hello Dash"),
+        html.H2(children="需給バランス"),
         # 期間の設定
         html.Div(
             children=[
@@ -44,7 +44,7 @@ layout = html.Div(
             children=[
                 "需給バランス対象エリア:",
                 dcc.Dropdown(
-                    config.areas,
+                    config.area2jparea,
                     "chubu",
                     id="area_selector",
                 ),
@@ -70,6 +70,7 @@ def update_price_graph(base_date):
         df, x="date_time", y=[f"area_price_{area}" for area in config.target_areas]
     )
     config.format_legend(fig)
+    fig.update_layout(title="スポット市場価格")
     return fig
 
 
@@ -84,12 +85,25 @@ def update_balance_graph(base_date, area):
     py_base_date = datetime.strptime(base_date, "%Y-%m-%d")
     begin = (py_base_date - timedelta(days=7)).strftime("%Y-%m-%d")
     end = py_base_date.strftime("%Y-%m-%d")
-    df = reader.read_demand_supply(begin, end).query(f"area_name=='{area}'")
+    df = reader.read_demand_supply(begin, end, ignore_negative_value=True).query(
+        f"area_name=='{area}'"
+    )
     fig = px.area(
         df,
         x="date_time",
-        y=config.demand_supply_names,
+        y=config.supply_names,
+        color_discrete_sequence=config.supply_colors
+    )
+    fig.add_trace(
+        go.Scatter(
+            x=df["date_time"],
+            y=df["area_demand"],
+            name="エリア需要",
+            marker={"color": "black"},
+        )
     )
     config.format_legend(fig)
+    jparea = config.area2jparea[area]
+    fig.update_layout(title=f"{jparea}:需給")
 
     return fig

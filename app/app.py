@@ -2,6 +2,7 @@ import argparse
 import pandas as pd
 import dash
 import dash_bootstrap_components as dbc
+from dash import dcc, html
 from datareader import DataReader
 from pages.common import Config
 from flask import request, jsonify
@@ -18,9 +19,16 @@ app = dash.Dash(__name__, external_stylesheets=external_stylesheets, use_pages=T
 app.layout = dbc.Container(
     [
         dbc.Row(
+            dbc.Col(
+                html.H1("電力需給・電力市場DashBoard"),
+                width=12,
+                style={"background-color": "palegreen", "color": "white"},
+            )
+        ),
+        dbc.Row(
             [dbc.Col(config.sidebar, width=2), dbc.Col(dash.page_container, width=10)],
-            style={"hegith": "100vh"},
-        )
+            style={"height": "90vh"},
+        ),
     ],
     fluid=True,
 )

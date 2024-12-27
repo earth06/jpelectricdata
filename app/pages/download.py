@@ -1,5 +1,4 @@
 from datetime import date
-from datetime import datetime, timedelta
 import dash
 from dash import dcc, html, callback
 from dash import Input, Output, State
@@ -17,7 +16,7 @@ fix = px.line(x=[1, 2, 3], y=[1, 2, 3])
 
 layout = html.Div(
     [
-        html.H1("期間フィルターダッシュボード"),
+        html.H2("期間フィルターダッシュボード"),
         html.Div(
             [
                 html.Label("開始日:"),
