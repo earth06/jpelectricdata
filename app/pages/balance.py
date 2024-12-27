@@ -28,7 +28,7 @@ layout = html.Div(
                     min_date_allowed=date(2024, 4, 1),
                     max_date_allowed=date.today() + timedelta(days=2),
                     date=date.today()
-                    - timedelta(10),  # callbackで参照させるときはここの引数の名前になる
+                    - timedelta(2),  # callbackで参照させるときはここの引数の名前になる
                 ),
             ]
         ),
