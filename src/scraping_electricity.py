@@ -6,6 +6,7 @@ import os
 from time import sleep
 from datetime import datetime
 from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
 from pathlib import Path
 import yaml
 import yaml.scanner
@@ -163,11 +164,10 @@ class ElectricData:
 
         options.add_argument("--headless=new")
         base_url = "https://setsuden.nw.tohoku-epco.co.jp/realtime_jukyu.html"
-
+        service = Service(executable_path=f"{ROOTDIR}/src/bin/chromedriver")
         sleep(2)
         for text in ["先月分実績ダウンロード", "今月分実績ダウンロード"]:
-            driver = webdriver.Chrome(
-                f"{ROOTDIR}/src/bin/chromedriver", options=options
+            driver = webdriver.Chrome( options=options, service=service
             )
             driver.get(base_url)
             element = driver.find_element_by_partial_link_text(text)
