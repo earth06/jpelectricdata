@@ -2,7 +2,7 @@ import argparse
 import pandas as pd
 import dash
 import dash_bootstrap_components as dbc
-from dash import dcc, html
+from dash import html
 from datareader import DataReader
 from pages.common import Config
 from flask import request, jsonify

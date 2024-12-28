@@ -167,8 +167,7 @@ class ElectricData:
         service = Service(executable_path=f"{ROOTDIR}/src/bin/chromedriver")
         sleep(2)
         for text in ["先月分実績ダウンロード", "今月分実績ダウンロード"]:
-            driver = webdriver.Chrome( options=options, service=service
-            )
+            driver = webdriver.Chrome(options=options, service=service)
             driver.get(base_url)
             element = driver.find_element_by_partial_link_text(text)
             sleep(2)

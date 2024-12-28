@@ -4,7 +4,6 @@ import dash_bootstrap_components as dbc
 
 class Config:
     def __init__(self):
-
         self.target_areas = ["chubu", "kyusyu", "kansai", "tokyo"]
         self.supply_names = [
             "nuclear",

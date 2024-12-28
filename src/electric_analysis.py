@@ -6,7 +6,6 @@ import os
 import numpy as np
 import matplotlib.patches as mpatches
 import argparse
-import japanize_matplotlib
 
 plt.style.use("ggplot")
 
@@ -122,9 +121,11 @@ class ElectricAnalysis:
         """
         self.df_jepx = pd.read_sql(sql, conn, parse_dates=["date_time"])
         conn.close()
-        return 
+        return
 
-    def plot_demand_supply(self, area_name="chubu", figsize=(18, 8), legend=True, alpha=1):
+    def plot_demand_supply(
+        self, area_name="chubu", figsize=(18, 8), legend=True, alpha=1
+    ):
         fig, ax = plt.subplots(figsize=figsize)
         tmp = self.df_demand.query(f"area_name=='{area_name}'").copy()
         tmp.index = pd.to_datetime(tmp["date_time"])
@@ -134,7 +135,9 @@ class ElectricAnalysis:
             },
             inplace=True,
         )
-        tmp[self.jplabels].plot(kind="area", color=self.colors, ax=ax,legend=False, alpha=alpha)
+        tmp[self.jplabels].plot(
+            kind="area", color=self.colors, ax=ax, legend=False, alpha=alpha
+        )
         tmp["area_demand"].plot(c="r", ax=ax, legend=False, marker=".")
         # 右上
         if legend:
