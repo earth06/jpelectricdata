@@ -7,6 +7,7 @@ from time import sleep
 from datetime import datetime
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.by import By
 from pathlib import Path
 import yaml
 import yaml.scanner
@@ -20,7 +21,7 @@ ROOTDIR = f"{os.path.dirname(__file__)}/.."
 class ElectricData:
     """電力需給実績を取得するクラス"""
 
-    def __init__(self, target_date: str = None):
+    def __init__(self, target_date: str = None, set_chromdriver=False):
         """コンストラクタ
 
         Args:
@@ -53,6 +54,11 @@ class ElectricData:
         }
         with open(f"{ROOTDIR}/src/detail_demand_supply_master.yml", "tr") as f:
             self.config = yaml.safe_load(f)
+        self.service = (
+            Service(executable_path=f"{ROOTDIR}/src/bin/chromedriver")
+            if set_chromdriver
+            else None
+        )
 
     def upsert(self, df: pd.DataFrame):
         conn = sqlite3.connect(f"{ROOTDIR}/data/data.db")
@@ -164,12 +170,11 @@ class ElectricData:
 
         options.add_argument("--headless=new")
         base_url = "https://setsuden.nw.tohoku-epco.co.jp/realtime_jukyu.html"
-        service = Service(executable_path=f"{ROOTDIR}/src/bin/chromedriver")
         sleep(2)
         for text in ["先月分実績ダウンロード", "今月分実績ダウンロード"]:
-            driver = webdriver.Chrome(options=options, service=service)
+            driver = webdriver.Chrome(options=options, service=self.service)
             driver.get(base_url)
-            element = driver.find_element_by_partial_link_text(text)
+            element = driver.find_element(By.PARTIAL_LINK_TEXT, text)
             sleep(2)
             element.click()
             sleep(5)
@@ -182,9 +187,11 @@ class ElectricData:
         print(filepath)
         return filepath
 
-    def load_with_check(self, filepath, area_name, encoding, skiprows=1):
+    def load_with_check(self, filepath, area_name, encoding, skiprows=1, sel_columns=False):
         df = pd.read_csv(filepath, encoding=encoding, skiprows=skiprows)
         org_cols = self.config["original_columns"][area_name]
+        if sel_columns:
+            df = df[org_cols]
         # check process
         col_check = (df.columns == org_cols).sum()
         if col_check == 20:
@@ -231,7 +238,7 @@ class ElectricData:
         return df
 
     def load_chugoku(self, filepath):
-        df = self.load_with_check(filepath, "chugoku", encoding="shift-jis")
+        df = self.load_with_check(filepath, "chugoku", encoding="shift-jis", sel_columns=True)
         df["date_time"] = pd.to_datetime(df["DATE"] + " " + df["TIME"])
         df["area_name"] = "chugoku"
         return df
@@ -351,9 +358,11 @@ if __name__ == "__main__":
         help="手動でダウンロードしたファイルを指定する,またエリア名を指定する必要がある",
     )
     parser.add_argument("--area_name", help="手動で登録する際の対象エリア名")
+    parser.add_argument("--set_chromedirver", action="store_true")
     args = parser.parse_args()
     if args.file is None:
-        elec = ElectricData(args.date)
+        #elec = ElectricData(args.date, set_chromdriver=args.set_chromedirver)
+        elec = ElectricData(args.date, set_chromdriver=True)
         elec.execute()
     else:
         elec = ElectricData()
