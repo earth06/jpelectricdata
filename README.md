@@ -29,6 +29,13 @@ mv chromedriver jpelectricdata/src/bin
 
 ## Usage
 
+0. 環境のセットアップ
+
+```bash
+cd jpeclectricdata/docs
+pip install -f requirements.txt
+```
+
 1. 最新データの取得
 
 ```bash
@@ -60,6 +67,12 @@ fig,ax=anal.plot_all_demand_supply()
 ![sample](./example/all_area_demand_supply.jpg)
 
 
+5. ダッシュボードの起動
+
+```bash
+cd jpelectricdata/app
+python app.py  --host <your host> --port <your port>
+```
 
 ## License
 
