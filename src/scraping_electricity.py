@@ -21,7 +21,7 @@ ROOTDIR = f"{os.path.dirname(__file__)}/.."
 class ElectricData:
     """電力需給実績を取得するクラス"""
 
-    def __init__(self, target_date: str = None, set_chromdriver=False):
+    def __init__(self, target_date: str = None, set_chromedriver=False):
         """コンストラクタ
 
         Args:
@@ -56,7 +56,7 @@ class ElectricData:
             self.config = yaml.safe_load(f)
         self.service = (
             Service(executable_path=f"{ROOTDIR}/src/bin/chromedriver")
-            if set_chromdriver
+            if set_chromedriver
             else None
         )
 
@@ -187,7 +187,9 @@ class ElectricData:
         print(filepath)
         return filepath
 
-    def load_with_check(self, filepath, area_name, encoding, skiprows=1, sel_columns=False):
+    def load_with_check(
+        self, filepath, area_name, encoding, skiprows=1, sel_columns=False
+    ):
         df = pd.read_csv(filepath, encoding=encoding, skiprows=skiprows)
         org_cols = self.config["original_columns"][area_name]
         if sel_columns:
@@ -238,7 +240,9 @@ class ElectricData:
         return df
 
     def load_chugoku(self, filepath):
-        df = self.load_with_check(filepath, "chugoku", encoding="shift-jis", sel_columns=True)
+        df = self.load_with_check(
+            filepath, "chugoku", encoding="shift-jis", sel_columns=True
+        )
         df["date_time"] = pd.to_datetime(df["DATE"] + " " + df["TIME"])
         df["area_name"] = "chugoku"
         return df
@@ -361,8 +365,8 @@ if __name__ == "__main__":
     parser.add_argument("--set_chromedirver", action="store_true")
     args = parser.parse_args()
     if args.file is None:
-        #elec = ElectricData(args.date, set_chromdriver=args.set_chromedirver)
-        elec = ElectricData(args.date, set_chromdriver=True)
+        # elec = ElectricData(args.date, set_chromdriver=args.set_chromedirver)
+        elec = ElectricData(args.date, set_chromedriver=True)
         elec.execute()
     else:
         elec = ElectricData()
