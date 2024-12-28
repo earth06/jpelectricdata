@@ -5,7 +5,7 @@ from pages.common import Config
 
 class DataReader:
     def __init__(self):
-        self.DBPATH = f"../data/data.db"
+        self.DBPATH = "../data/data.db"
         self.cfg = Config()
 
     def read_sql(self, sql):

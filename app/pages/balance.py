@@ -92,7 +92,7 @@ def update_balance_graph(base_date, area):
         df,
         x="date_time",
         y=config.supply_names,
-        color_discrete_sequence=config.supply_colors
+        color_discrete_sequence=config.supply_colors,
     )
     fig.add_trace(
         go.Scatter(
