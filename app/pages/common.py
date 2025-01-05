@@ -85,8 +85,8 @@ class Config:
             "kyusyu": "九州",
         }
 
-        self.page_paths = ["/", "/balance", "/download"]
-        self.page_names = ["ホーム", "需給バランス", "ダウンロード"]
+        self.page_paths = ["/", "/balance", "/download", "/publishapiurl"]
+        self.page_names = ["ホーム", "需給バランス", "ダウンロード", "apiurl発行"]
         self.sidebar = html.Div(
             [html.H2(children="Index")]
             + [

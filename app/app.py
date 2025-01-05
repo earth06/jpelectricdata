@@ -52,5 +52,4 @@ if __name__ == "__main__":
     parser.add_argument("--debug", action="store_true")
     args = parser.parse_args()
     app.run(host=args.host, port=args.port, debug=args.debug)
-
     # app.run_server(mode="inline") #jupyter
