@@ -14,6 +14,7 @@ config = Config()
 # bootstrapを適用するにはstylesheetを指定する必要がある
 external_stylesheets = [dbc.themes.FLATLY]
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets, use_pages=True)
+server = app.server
 
 
 app.layout = dbc.Container(

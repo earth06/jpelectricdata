@@ -4,3 +4,4 @@ data/*.zip
 **/.ipynb_checkpoints
 **/__pycache__
 src/bin/chromedriver
+app/app.log
