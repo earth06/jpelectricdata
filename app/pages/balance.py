@@ -15,45 +15,49 @@ dash.register_page(__name__)
 
 # layout変数を定義しておくとマルチページ読み込みのときにapp.layoutに設定してくれるらしい
 
-fig = px.line(x=[1, 2, 3], y=[1, 2, 3])
-layout = html.Div(
-    children=[
-        html.H2(children="需給バランス"),
-        # 期間の設定
-        html.Div(
-            children=[
-                "推論実行日:",
-                dcc.DatePickerSingle(
-                    id="plot_base_date",
-                    min_date_allowed=date(2024, 4, 1),
-                    max_date_allowed=date.today() + timedelta(days=2),
-                    date=date.today()
-                    - timedelta(2),  # callbackで参照させるときはここの引数の名前になる
+
+
+def layout(**kwargs):
+    fig = px.line(x=[1, 2, 3], y=[1, 2, 3])
+    balance_page = html.Div(
+        children=[
+                html.H2(children="需給バランス"),
+                # 期間の設定
+                html.Div(
+                    children=[
+                        "推論実行日:",
+                        dcc.DatePickerSingle(
+                            id="plot_base_date",
+                            min_date_allowed=date(2024, 4, 1),
+                            max_date_allowed=date.today() + timedelta(days=2),
+                            date=date.today()
+                            - timedelta(2),  # callbackで参照させるときはここの引数の名前になる
+                        ),
+                    ]
                 ),
-            ]
-        ),
-        # 予測対象エリアの設定
-        html.Div(
-            children=[
-                "予測対象エリア:",
-                dcc.Checklist(config.target_areas, ["chubu"], inline=True),
-            ]
-        ),
-        # 需給の対象エリア
-        html.Div(
-            children=[
-                "需給バランス対象エリア:",
-                dcc.Dropdown(
-                    config.area2jparea,
-                    "chubu",
-                    id="area_selector",
+                # 予測対象エリアの設定
+                html.Div(
+                    children=[
+                        "予測対象エリア:",
+                        dcc.Checklist(config.target_areas, ["chubu"], inline=True),
+                    ]
                 ),
+                # 需給の対象エリア
+                html.Div(
+                    children=[
+                        "需給バランス対象エリア:",
+                        dcc.Dropdown(
+                            config.area2jparea,
+                            "chubu",
+                            id="area_selector",
+                        ),
+                    ]
+                ),
+                dcc.Graph(id="price-graph2", figure=fig),  # defaultをNoneは許容されない
+                dcc.Graph(id="balance-graph", figure=fig),
             ]
-        ),
-        dcc.Graph(id="price-graph2", figure=fig),  # defaultをNoneは許容されない
-        dcc.Graph(id="balance-graph", figure=fig),
-    ]
-)
+        )
+    return balance_page
 
 
 @callback(

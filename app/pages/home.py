@@ -13,47 +13,50 @@ config = Config()
 
 dash.register_page(__name__, path="/")
 
-# layout変数を定義しておくとマルチページ読み込みのときにapp.layoutに設定してくれるらしい
-fig = px.line(x=[1, 2, 3], y=[1, 2, 3])
-layout = html.Div(
-    children=[
-        html.H2(children="市場価格と全エリアの需給"),
-        # 期間の設定
-        html.Div(
-            children=[
-                "推論実行日:",
-                dcc.DatePickerSingle(
-                    id="plot_base_date",
-                    min_date_allowed=date(2024, 4, 1),
-                    max_date_allowed=date.today() + timedelta(days=2),
-                    date=date.today(),  # callbackで参照させるときはここの引数の名前になる
-                ),
-            ]
-        ),
-        # 予測対象エリアの設定
-        html.Div(
-            children=[
-                "予測対象エリア:",
-                dcc.Checklist(config.target_areas, ["chubu"], inline=True),
-            ]
-        ),
-        # 需給の対象エリア
-        html.Div(
-            children=[
-                # "需給実績対象エリア:",
-                # dcc.Checklist(config.areas, ["chubu"], inline=True),
-                "需給項目:",
-                dcc.Dropdown(
-                    options=config.demand_supply2_jpnames,
-                    value="area_demand",
-                    id="demand_supply_selector",
-                ),
-            ]
-        ),
-        dcc.Graph(id="price-graph", figure=fig),
-        dcc.Graph(id="demand-graph", figure=fig),
-    ]
-)
+
+def layout(**kwargs):
+    # layout変数を定義しておくとマルチページ読み込みのときにapp.layoutに設定してくれるらしい
+    fig = px.line(x=[1, 2, 3], y=[1, 2, 3])
+    home_page = html.Div(
+        children=[
+            html.H2(children="市場価格と全エリアの需給"),
+            # 期間の設定
+            html.Div(
+                children=[
+                    "推論実行日:",
+                    dcc.DatePickerSingle(
+                        id="plot_base_date",
+                        min_date_allowed=date(2024, 4, 1),
+                        max_date_allowed=date.today() + timedelta(days=2),
+                        date=date.today(),  # callbackで参照させるときはここの引数の名前になる
+                    ),
+                ]
+            ),
+            # 予測対象エリアの設定
+            html.Div(
+                children=[
+                    "予測対象エリア:",
+                    dcc.Checklist(config.target_areas, ["chubu"], inline=True),
+                ]
+            ),
+            # 需給の対象エリア
+            html.Div(
+                children=[
+                    # "需給実績対象エリア:",
+                    # dcc.Checklist(config.areas, ["chubu"], inline=True),
+                    "需給項目:",
+                    dcc.Dropdown(
+                        options=config.demand_supply2_jpnames,
+                        value="area_demand",
+                        id="demand_supply_selector",
+                    ),
+                ]
+            ),
+            dcc.Graph(id="price-graph", figure=fig),
+            dcc.Graph(id="demand-graph", figure=fig),
+        ]
+    )
+    return home_page
 
 
 # date singlepickerのdate属性をとる
