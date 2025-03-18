@@ -1,15 +1,12 @@
 [Unit]
 Description = uWSGI
-After = syslog.target
 
 [Service]
-ExecStartPre=/usr/bin/cd　/home/takato/Git/jpelectricdata/app
-ExecStart= /home/takato/Git/jpelectricdata/.venv/bin/uwsgi --ini /home/takato/Git/jpelectricdata/app/app.ini
+ExecStart= /home/oonishi/repos/jpelectricdata/.venv/bin/uwsgi --ini /home/oonishi/repos/jpelectricdata/app/app.ini
 ExecStop=/bin/kill -INT ${MAINPID}
 KillSignal=SIGQUIT
 Type=notify
 StandardError=syslog
-NotifyAccess=all
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=default.target
