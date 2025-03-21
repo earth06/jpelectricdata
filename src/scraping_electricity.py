@@ -1,19 +1,20 @@
+import argparse
+import glob
+import os
+import sqlite3
 import traceback
 import zipfile
+from datetime import datetime
+from pathlib import Path
+from time import sleep
+
 import pandas as pd
 import requests
-import os
-from time import sleep
-from datetime import datetime
+import yaml
+import yaml.scanner
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
-from pathlib import Path
-import yaml
-import yaml.scanner
-import glob
-import argparse
-import sqlite3
 
 ROOTDIR = f"{os.path.dirname(__file__)}/.."
 
@@ -52,13 +53,9 @@ class ElectricData:
             "shikoku": "08",
             "kyusyu": "09",
         }
-        with open(f"{ROOTDIR}/src/detail_demand_supply_master.yml", "tr") as f:
+        with open(f"{ROOTDIR}/src/detail_demand_supply_master.yml") as f:
             self.config = yaml.safe_load(f)
-        self.service = (
-            Service(executable_path=f"{ROOTDIR}/src/bin/chromedriver")
-            if set_chromedriver
-            else None
-        )
+        self.service = Service(executable_path=f"{ROOTDIR}/src/bin/chromedriver") if set_chromedriver else None
 
     def upsert(self, df: pd.DataFrame):
         conn = sqlite3.connect(f"{ROOTDIR}/data/data.db")
@@ -83,7 +80,7 @@ class ElectricData:
                 data = res.content.decode(encoding=encoding)
                 filename = os.path.basename(url)
                 filepath = f"{self.OUTDIR}/{filename}"
-                with open(filepath, "wt", encoding=encoding) as f:
+                with open(filepath, "w", encoding=encoding) as f:
                     f.write(data)
                 print("success")
                 return filepath
@@ -92,65 +89,49 @@ class ElectricData:
 
     def get_hokuden(self):
         yyyymmdd = (self.target_date - pd.offsets.Day(1)).strftime("%Y%m%d")
-        base_url = (
-            f"https://denkiyoho.hepco.co.jp/area/data/{yyyymmdd}_hokkaido_jukyu.csv"
-        )
+        base_url = f"https://denkiyoho.hepco.co.jp/area/data/{yyyymmdd}_hokkaido_jukyu.csv"
         filepath = self.get_data([base_url], encoding="shift-jis")
         return filepath
 
     def get_chuden(self):
         base_url = "https://powergrid.chuden.co.jp/denki_yoho_content_data"
-        url_list = [
-            f"{base_url}/eria_jukyu_{yyyymm}_04.csv" for yyyymm in self.yyyymm_s
-        ]
+        url_list = [f"{base_url}/eria_jukyu_{yyyymm}_04.csv" for yyyymm in self.yyyymm_s]
         filepath = self.get_data(url_list, encoding="shift-jis")
         return filepath
 
     def get_touden(self):
         base_url = "https://www.tepco.co.jp/forecast/html/images"
-        url_list = [
-            f"{base_url}/eria_jukyu_{yyyymm}_03.csv" for yyyymm in self.yyyymm_s
-        ]
+        url_list = [f"{base_url}/eria_jukyu_{yyyymm}_03.csv" for yyyymm in self.yyyymm_s]
         filepath = self.get_data(url_list, encoding="utf-8")
         return filepath
 
     def get_kanden(self):
         base_url = "https://www.kansai-td.co.jp/interchange/denkiyoho/area-performance"
-        url_list = [
-            f"{base_url}/eria_jukyu_{yyyymm}_06.csv" for yyyymm in self.yyyymm_s
-        ]
+        url_list = [f"{base_url}/eria_jukyu_{yyyymm}_06.csv" for yyyymm in self.yyyymm_s]
         filepath = self.get_data(url_list, encoding="shift-jis")
         return filepath
 
     def get_kyuden(self):
         base_url = "https://www.kyuden.co.jp/td_area_jukyu/csv/"
-        url_list = [
-            f"{base_url}/eria_jukyu_{yyyymm}_09.csv" for yyyymm in self.yyyymm_s
-        ]
+        url_list = [f"{base_url}/eria_jukyu_{yyyymm}_09.csv" for yyyymm in self.yyyymm_s]
         filepath = self.get_data(url_list, encoding="shift-jis")
         return filepath
 
     def get_yonden(self):
         base_url = "https://www.yonden.co.jp/nw/supply_demand/csv"
-        url_list = [
-            f"{base_url}/eria_jukyu_{yyyymm}_08.csv" for yyyymm in self.yyyymm_s
-        ]
+        url_list = [f"{base_url}/eria_jukyu_{yyyymm}_08.csv" for yyyymm in self.yyyymm_s]
         filepath = self.get_data(url_list, encoding="shift-jis")
         return filepath
 
     def get_chugokuden(self):
         base_url = "https://www.energia.co.jp/nw/jukyuu/sys"
-        url_list = [
-            f"{base_url}/eria_jukyu_{yyyymm}_07.csv" for yyyymm in self.yyyymm_s
-        ]
+        url_list = [f"{base_url}/eria_jukyu_{yyyymm}_07.csv" for yyyymm in self.yyyymm_s]
         filepath = self.get_data(url_list, encoding="shift-jis")
         return filepath
 
     def get_rikuden(self):
         base_url = "https://www.rikuden.co.jp/nw/denki-yoho/csv"
-        url_list = [
-            f"{base_url}/eria_jukyu_{yyyymm}_05.csv" for yyyymm in self.yyyymm_s
-        ]
+        url_list = [f"{base_url}/eria_jukyu_{yyyymm}_05.csv" for yyyymm in self.yyyymm_s]
         filepath = self.get_data(url_list, encoding="shift-jis")
         return filepath
 
@@ -187,9 +168,7 @@ class ElectricData:
         print(filepath)
         return filepath
 
-    def load_with_check(
-        self, filepath, area_name, encoding, skiprows=1, sel_columns=False
-    ):
+    def load_with_check(self, filepath, area_name, encoding, skiprows=1, sel_columns=False):
         df = pd.read_csv(filepath, encoding=encoding, skiprows=skiprows)
         org_cols = self.config["original_columns"][area_name]
         if sel_columns:
@@ -199,19 +178,14 @@ class ElectricData:
         if col_check == 20:
             df.columns = self.config["common_columns"]
             return df
-        else:
-            print("original:", org_cols, "current:", df.columns)
-            raise
+        print("original:", org_cols, "current:", df.columns)
+        raise
         return None
 
     def load_hokkaido(self, filepath):
-        df = self.load_with_check(
-            filepath, "hokkaido", encoding="shift-jis", skiprows=2
-        ).loc[1:]
+        df = self.load_with_check(filepath, "hokkaido", encoding="shift-jis", skiprows=2).loc[1:]
         df["TIME"] = df["TIME"].str.split("〜").apply(lambda x: x[0])
-        df["date_time"] = pd.to_datetime(
-            df["DATE"] + " " + df["TIME"], format="%Y/%m/%d %H:%M"
-        )
+        df["date_time"] = pd.to_datetime(df["DATE"] + " " + df["TIME"], format="%Y/%m/%d %H:%M")
         df["area_name"] = "hokkaido"
         return df
 
@@ -240,9 +214,7 @@ class ElectricData:
         return df
 
     def load_chugoku(self, filepath):
-        df = self.load_with_check(
-            filepath, "chugoku", encoding="shift-jis", sel_columns=True
-        )
+        df = self.load_with_check(filepath, "chugoku", encoding="shift-jis", sel_columns=True)
         df["date_time"] = pd.to_datetime(df["DATE"] + " " + df["TIME"])
         df["area_name"] = "chugoku"
         return df
@@ -260,9 +232,7 @@ class ElectricData:
         idx_24h = (df["TIME"] == "24:00") | (df["TIME"] == "24:00:00")
         df.loc[idx_24h, "date"] = df.loc[idx_24h, "date"] + pd.offsets.Day(1)
         df.loc[idx_24h, "TIME"] = "00:00"
-        df["date_time"] = pd.to_datetime(
-            df["date"].dt.strftime("%Y-%m-%d") + " " + df["TIME"]
-        )
+        df["date_time"] = pd.to_datetime(df["date"].dt.strftime("%Y-%m-%d") + " " + df["TIME"])
         # おそらく九州電力だけ前30分を見ているので、他と合わせるために30分戻す
         df["date_time"] = df["date_time"] - pd.offsets.Minute(30)
         df["area_name"] = "kyusyu"
@@ -276,9 +246,7 @@ class ElectricData:
                 df_list = []
                 for filename in filelist:
                     with zf.open(filename) as f:
-                        df_list.append(
-                            self.load_with_check(f, "tohoku", encoding="shift-jis")
-                        )
+                        df_list.append(self.load_with_check(f, "tohoku", encoding="shift-jis"))
             df = pd.concat(df_list)
         else:
             df = self.load_with_check(filepath, "tohoku", encoding="shift-jis")
@@ -311,7 +279,7 @@ class ElectricData:
             self.load_kyusyu,
         ]
 
-        for i, (get_method, load_method) in enumerate(zip(get_methods, load_methods)):
+        for i, (get_method, load_method) in enumerate(zip(get_methods, load_methods, strict=False)):
             try:
                 print(i)
                 filepath = get_method()
@@ -353,9 +321,7 @@ class ElectricData:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--date", help="取得する月,指定がなければ当月を設定する('yyyy-mm')"
-    )
+    parser.add_argument("--date", help="取得する月,指定がなければ当月を設定する('yyyy-mm')")
     parser.add_argument(
         "--file",
         default=None,

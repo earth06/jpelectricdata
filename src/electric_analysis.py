@@ -1,14 +1,14 @@
-import matplotlib.pyplot as plt
-import sqlite3
-import pandas as pd
-from datetime import datetime, timedelta
-import os
-import numpy as np
-import matplotlib.patches as mpatches
 import argparse
+import os
+import sqlite3
+from datetime import datetime, timedelta
+
+import matplotlib.patches as mpatches
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 
 plt.style.use("ggplot")
-
 ROOTDIR = f"{os.path.dirname(__file__)}/.."
 
 
@@ -85,9 +85,7 @@ class ElectricAnalysis:
             "九州",
         ]
 
-    def load_demand_supply(
-        self, begin: str = None, end: str = None, ignore_negative_value=True
-    ):
+    def load_demand_supply(self, begin: str = None, end: str = None, ignore_negative_value=True):
         if begin is None:
             begin = (datetime.today() - timedelta(days=1)).strftime("%Y-%m-%d 00:00:00")
         if end is None:
@@ -96,14 +94,12 @@ class ElectricAnalysis:
         self.end = end
         conn = sqlite3.connect(f"{ROOTDIR}/data/data.db")
         sql = f"""
-            SELECT * FROM detail_demand_supply 
+            SELECT * FROM detail_demand_supply
             WHERE date_time BETWEEN '{self.begin}' AND '{self.end}'
-        """
+        """  # noqa: S608
         self.df_demand = pd.read_sql(sql, conn, parse_dates=["date_time"])
         if ignore_negative_value:
-            self.df_demand[self.labels] = self.df_demand[self.labels].where(
-                self.df_demand[self.labels] >= 0, 0
-            )
+            self.df_demand[self.labels] = self.df_demand[self.labels].where(self.df_demand[self.labels] >= 0, 0)
         conn.close()
         return
 
@@ -123,21 +119,15 @@ class ElectricAnalysis:
         conn.close()
         return
 
-    def plot_demand_supply(
-        self, area_name="chubu", figsize=(18, 8), legend=True, alpha=1
-    ):
+    def plot_demand_supply(self, area_name="chubu", figsize=(18, 8), legend=True, alpha=1):
         fig, ax = plt.subplots(figsize=figsize)
         tmp = self.df_demand.query(f"area_name=='{area_name}'").copy()
         tmp.index = pd.to_datetime(tmp["date_time"])
         tmp.rename(
-            columns={
-                label: jplabel for label, jplabel in zip(self.labels, self.jplabels)
-            },
+            columns={label: jplabel for label, jplabel in zip(self.labels, self.jplabels)},
             inplace=True,
         )
-        tmp[self.jplabels].plot(
-            kind="area", color=self.colors, ax=ax, legend=False, alpha=alpha
-        )
+        tmp[self.jplabels].plot(kind="area", color=self.colors, ax=ax, legend=False, alpha=alpha)
         tmp["area_demand"].plot(c="r", ax=ax, legend=False, marker=".")
         # 右上
         if legend:
@@ -148,21 +138,17 @@ class ElectricAnalysis:
         fig = plt.figure(figsize=figsize)
         ax = np.zeros(9, dtype=np.object_)
         area_names = self.df_demand["area_name"].unique()
-        for i, (area_name, jp_area_name) in enumerate(zip(self.areas, self.jpareas)):
+        for i, (area_name, jp_area_name) in enumerate(zip(self.areas, self.jpareas, strict=False)):
             if area_name not in area_names:
                 continue
             ax[i] = fig.add_subplot(3, 3, i + 1)
             tmp = self.df_demand.query(f"area_name=='{area_name}'").copy()
             tmp.index = pd.to_datetime(tmp["date_time"])
             tmp.rename(
-                columns={
-                    label: jplabel for label, jplabel in zip(self.labels, self.jplabels)
-                },
+                columns={label: jplabel for label, jplabel in zip(self.labels, self.jplabels)},
                 inplace=True,
             )
-            tmp[self.jplabels].plot(
-                kind="area", color=self.colors, ax=ax[i], legend=False, alpha=0.8
-            )
+            tmp[self.jplabels].plot(kind="area", color=self.colors, ax=ax[i], legend=False, alpha=0.8)
             tmp["area_demand"].plot(c="k", ax=ax[i], legend=False)
             ax[i].set_xlabel("")
             ax[i].set_title(jp_area_name)
@@ -175,19 +161,12 @@ class ElectricAnalysis:
                 ax[i].set_ylabel("")
 
         # 凡例
-        patches = [
-            mpatches.Patch(color=color, label=label)
-            for color, label in zip(self.colors, self.labels)
-        ]
-        fig.legend(
-            handles=patches, loc="upper left", bbox_to_anchor=(0.9, 0.8, 0.2, 0.1)
-        )
+        patches = [mpatches.Patch(color=color, label=label) for color, label in zip(self.colors, self.labels)]
+        fig.legend(handles=patches, loc="upper left", bbox_to_anchor=(0.9, 0.8, 0.2, 0.1))
         fig.suptitle("エリア需給実績速報値")
         fig.subplots_adjust(hspace=0.25)
         if save:
-            fig.savefig(
-                f"{ROOTDIR}/example/all_area_demand_supply.jpg", bbox_inches="tight"
-            )
+            fig.savefig(f"{ROOTDIR}/example/all_area_demand_supply.jpg", bbox_inches="tight")
         return fig, ax
 
 

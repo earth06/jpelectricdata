@@ -1,9 +1,10 @@
-import pandas as pd
-import sqlite3
-import os
-import yaml
 import argparse
+import os
+import sqlite3
 from datetime import datetime
+
+import pandas as pd
+import yaml
 
 ROOTDIR = f"{os.path.dirname(__file__)}/.."  # noqa
 
@@ -37,7 +38,7 @@ class JEPXData:
             raise
         else:
             # date_time列を定義
-            timecode2time = {i + 1: f"{i//2:02d}:{(i%2)*30:02d}" for i in range(48)}
+            timecode2time = {i + 1: f"{i // 2:02d}:{(i % 2) * 30:02d}" for i in range(48)}
             df["time"] = df["時刻コード"].apply(lambda x: timecode2time[x])
             df["年月日"] = pd.to_datetime(df["年月日"] + " " + df["time"])
             # カラムをrename
@@ -59,9 +60,7 @@ class JEPXData:
                 year = today.year - 1
             else:
                 year = today.year
-        df = pd.read_csv(
-            f"http://www.jepx.jp/market/excel/spot_{year}.csv", encoding="shift-jis"
-        )
+        df = pd.read_csv(f"http://www.jepx.jp/market/excel/spot_{year}.csv", encoding="shift-jis")
         df = df[self.org_columns].copy()
         return df
 

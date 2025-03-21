@@ -1,10 +1,9 @@
-from datetime import date
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
+
 import dash
-from dash import dcc, html, callback
-from dash import Input, Output
 import plotly.express as px
 import plotly.graph_objects as go
+from dash import Input, Output, callback, dcc, html
 from datareader import DataReader
 from pages.common import Config
 

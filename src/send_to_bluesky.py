@@ -1,9 +1,10 @@
-from electric_analysis import ElectricAnalysis
-from atproto import Client
 import os
-import matplotlib
 from datetime import datetime, timedelta
 
+import matplotlib
+from atproto import Client
+
+from electric_analysis import ElectricAnalysis
 
 begin = (datetime.now() - timedelta(days=7)).strftime("%Y-%m-%d")
 end = (datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d")
