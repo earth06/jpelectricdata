@@ -1,12 +1,12 @@
 import argparse
-import pandas as pd
+
 import dash
 import dash_bootstrap_components as dbc
+import pandas as pd
 from dash import html
 from datareader import DataReader
+from flask import jsonify, request
 from pages.common import Config
-from flask import request, jsonify
-
 
 reader = DataReader()
 config = Config()

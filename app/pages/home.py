@@ -1,10 +1,8 @@
-from datetime import date
-from datetime import datetime, timedelta
-import dash
-from dash import dcc, html, callback
-from dash import Input, Output
-import plotly.express as px
+from datetime import date, datetime, timedelta
 
+import dash
+import plotly.express as px
+from dash import Input, Output, callback, dcc, html
 from datareader import DataReader
 from pages.common import Config
 
@@ -94,8 +92,6 @@ def update_price_graph(base_date):
     begin = (py_base_date - timedelta(days=7)).strftime("%Y-%m-%d")
     end = py_base_date.strftime("%Y-%m-%d")
     df = reader.read_spot_price(begin, end)
-    fig = px.line(
-        df, x="date_time", y=[f"area_price_{area}" for area in config.target_areas]
-    )
+    fig = px.line(df, x="date_time", y=[f"area_price_{area}" for area in config.target_areas])
     config.format_legend(fig)
     return fig

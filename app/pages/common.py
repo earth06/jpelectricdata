@@ -1,5 +1,5 @@
-from dash import html, dcc
 import dash_bootstrap_components as dbc
+from dash import dcc, html
 
 
 class Config:
@@ -56,9 +56,7 @@ class Config:
             "battery": "蓄電池",
             "connector": "連系線",
         }
-        self.jp2en_demand_supply = {
-            val: key for key, val in self.demand_supply2_jpnames.items()
-        }
+        self.jp2en_demand_supply = {val: key for key, val in self.demand_supply2_jpnames.items()}
 
         self.demand_supply_names = self.supply_names + ["area_demand"]
         self.areas = [
@@ -89,10 +87,7 @@ class Config:
         self.page_names = ["ホーム", "需給バランス", "ダウンロード", "apiurl発行"]
         self.sidebar = html.Div(
             [html.H2(children="Index")]
-            + [
-                html.Div(dcc.Link(page, href=page_path))
-                for page, page_path in zip(self.page_names, self.page_paths)
-            ]
+            + [html.Div(dcc.Link(page, href=page_path)) for page, page_path in zip(self.page_names, self.page_paths)]
         )
 
     def generate_side_main_layout(self, layout):
@@ -109,13 +104,13 @@ class Config:
 
     def format_legend(self, fig):
         fig.update_layout(
-            legend=dict(
-                orientation="h",  # 凡例を横に並べる
-                entrywidth=0.2,  # 凡例の幅(いまいちよくわからん)
-                yanchor="bottom",
-                y=1.02,
-                xanchor="right",
-                x=1,
-                entrywidthmode="fraction",  # 0-1で凡例の幅を決める
-            )
+            legend={
+                "orientation": "h",  # 凡例を横に並べる
+                "entrywidth": 0.2,  # 凡例の幅(いまいちよくわからん)
+                "yanchor": "bottom",
+                "y": 1.02,
+                "xanchor": "right",
+                "x": 1,
+                "entrywidthmode": "fraction",  # 0-1で凡例の幅を決める
+            }
         )

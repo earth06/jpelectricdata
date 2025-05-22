@@ -1,10 +1,9 @@
 from datetime import date
 
 import dash
-from dash import dcc, html, callback
-from dash import Input, Output, State
-import plotly.express as px
 import pandas as pd
+import plotly.express as px
+from dash import Input, Output, State, callback, dcc, html
 from datareader import DataReader
 from pages.common import Config
 
