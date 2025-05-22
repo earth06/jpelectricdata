@@ -83,8 +83,8 @@ class Config:
             "kyusyu": "九州",
         }
 
-        self.page_paths = ["/", "/balance", "/download", "/publishapiurl"]
-        self.page_names = ["ホーム", "需給バランス", "ダウンロード", "apiurl発行"]
+        self.page_paths = ["/", "/balance", "/download", "/publishapiurl", "trend"]
+        self.page_names = ["ホーム", "需給バランス", "ダウンロード", "apiurl発行", "1か月トレンド"]
         self.sidebar = html.Div(
             [html.H2(children="Index")]
             + [html.Div(dcc.Link(page, href=page_path)) for page, page_path in zip(self.page_names, self.page_paths)]
