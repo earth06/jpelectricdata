@@ -18,50 +18,147 @@ dash.register_page(__name__)
 
 # layout変数を定義しておくとマルチページ読み込みのときにapp.layoutに設定してくれるらしい
 
+CARD_CLASS = "rounded-2xl border border-gray-200 bg-white p-6 shadow-lg"
+SECTION_TITLE_CLASS = "text-xs font-semibold uppercase tracking-[0.35em] text-yellow-600"
+BLOCK_TITLE_CLASS = "text-xl font-semibold text-gray-900"
+SUBTEXT_CLASS = "text-sm text-gray-700"
+LABEL_CLASS = "block text-sm font-medium text-gray-700"
 
 def layout(**kwargs):
     fig = px.line(x=[1, 2, 3], y=[1, 2, 3])
-    balance_page = html.Div(
+    trend_page = html.Div(
+        className="space-y-8",
         children=[
-            html.H2(children="需給バランス"),
-            # 期間の設定
             html.Div(
+                className="space-y-2",
                 children=[
-                    "推論実行日:",
-                    dcc.DatePickerSingle(
-                        id="plot_base_date",
-                        min_date_allowed=date(2024, 4, 1),
-                        max_date_allowed=date.today() + timedelta(days=2),
-                        date=date.today() - timedelta(2),  # callbackで参照させるときはここの引数の名前になる
+                    html.Span("1か月トレンド", className=SECTION_TITLE_CLASS),
+                    html.H2("需給と市場価格のトレンド把握", className=BLOCK_TITLE_CLASS),
+                    html.P(
+                        "直近1か月の推移を俯瞰し、スポット指標と需給バランスの相関を確認します。",
+                        className=SUBTEXT_CLASS,
                     ),
-                ]
-            ),
-            # 需給の対象エリア
-            html.Div(
-                children=[
-                    "スポット取引結果項目:",
-                    dcc.Dropdown(
-                        ["block", "price"],
-                        "price",
-                        id="spot_selector",
-                    ),
-                ]
+                ],
             ),
             html.Div(
+                className="grid gap-6 xl:grid-cols-[1.2fr,2fr]",
                 children=[
-                    "需給バランス対象エリア:",
-                    dcc.Dropdown(
-                        custom_area_options,
-                        "chubu",
-                        id="area_selector",
+                    html.Div(
+                        className=f"{CARD_CLASS} space-y-6",
+                        children=[
+                            html.Div(
+                                className="space-y-1",
+                                children=[
+                                    html.H3("ビュー設定", className="text-lg font-semibold text-gray-900"),
+                                    html.P(
+                                        "分析対象の期間と指標を切り替えます。",
+                                        className=SUBTEXT_CLASS,
+                                    ),
+                                ],
+                            ),
+                            html.Div(
+                                className="space-y-4",
+                                children=[
+                                    html.Div(
+                                        className="space-y-2",
+                                        children=[
+                                            html.Label("基準日", className=LABEL_CLASS),
+                                            dcc.DatePickerSingle(
+                                                id="plot_base_date",
+                                                min_date_allowed=date(2024, 4, 1),
+                                                max_date_allowed=date.today() + timedelta(days=2),
+                                                date=date.today() - timedelta(2),
+                                                display_format="YYYY-MM-DD",
+                                                className="tailwind-date-picker",
+                                            ),
+                                        ],
+                                    ),
+                                    html.Div(
+                                        className="space-y-2",
+                                        children=[
+                                            html.Label("スポット取引結果項目", className=LABEL_CLASS),
+                                            dcc.Dropdown(
+                                                [
+                                                    {"label": "価格", "value": "price"},
+                                                    {"label": "ブロック取引量", "value": "block"},
+                                                ],
+                                                "price",
+                                                id="spot_selector",
+                                                className="tailwind-dropdown text-sm",
+                                                clearable=False,
+                                            ),
+                                        ],
+                                    ),
+                                    html.Div(
+                                        className="space-y-2",
+                                        children=[
+                                            html.Label("需給バランス対象エリア", className=LABEL_CLASS),
+                                            dcc.Dropdown(
+                                                [
+                                                    {"label": label, "value": value}
+                                                    for value, label in custom_area_options.items()
+                                                ],
+                                                "chubu",
+                                                id="area_selector",
+                                                className="tailwind-dropdown text-sm",
+                                                clearable=False,
+                                            ),
+                                        ],
+                                    ),
+                                ],
+                            ),
+                        ],
                     ),
-                ]
+                    html.Div(
+                        className="space-y-6",
+                        children=[
+                            html.Div(
+                                className=f"{CARD_CLASS} card-plotly space-y-4",
+                                children=[
+                                    html.Div(
+                                        className="flex items-center justify-between",
+                                        children=[
+                                            html.H3("スポット市場", className="text-lg font-semibold text-gray-900"),
+                                            html.Span("30日間の推移", className="text-xs text-gray-700"),
+                                        ],
+                                    ),
+                                    dcc.Graph(
+                                        id="trend-price-graph",
+                                        figure=fig,
+                                        config={"displaylogo": False, "responsive": True},
+                                        responsive=True,
+                                        style={"width": "100%", "height": "420px"},
+                                        className="rounded-xl border border-gray-100 bg-gray-50 p-2",
+                                    ),
+                                ],
+                            ),
+                            html.Div(
+                                className=f"{CARD_CLASS} card-plotly space-y-4",
+                                children=[
+                                    html.Div(
+                                        className="flex items-center justify-between",
+                                        children=[
+                                            html.H3("需給バランス", className="text-lg font-semibold text-gray-900"),
+                                            html.Span("積み上げ表示", className="text-xs text-gray-700"),
+                                        ],
+                                    ),
+                                    dcc.Graph(
+                                        id="trend-graph",
+                                        figure=fig,
+                                        config={"displaylogo": False, "responsive": True},
+                                        responsive=True,
+                                        style={"width": "100%", "height": "460px"},
+                                        className="rounded-xl border border-gray-100 bg-gray-50 p-2",
+                                    ),
+                                ],
+                            ),
+                        ],
+                    ),
+                ],
             ),
-            dcc.Graph(id="trend-price-graph", figure=fig),  # defaultをNoneは許容されない
-            dcc.Graph(id="trend-graph", figure=fig),
-        ]
+        ],
     )
-    return balance_page
+    return trend_page
 
 
 @callback(Output("trend-price-graph", "figure"), Input("plot_base_date", "date"), Input("spot_selector", "value"))
@@ -89,6 +186,7 @@ def update_price_graph(base_date, spot_col):
         yaxis={"fixedrange": False},
         xaxis={"rangeslider": {"visible": True, "thickness": 0.1}, "type": "date"},
     )
+    config.apply_chart_theme(fig)
     return fig
 
 
@@ -114,12 +212,15 @@ def update_trend_graph(base_date, area):
         y=config.supply_names,
         color_discrete_sequence=config.supply_colors,
     )
+    for trace in fig.data:
+        if getattr(trace, "fill", None) in ("tonexty", "tozeroy"):
+            trace.update(line={"width": 0.4}, opacity=0.85)
     fig.add_trace(
         go.Scatter(
             x=df["date_time"],
             y=df["area_demand"],
             name="エリア需要",
-            marker={"color": "black"},
+            line={"color": "#1e3a8a", "width": 3},
         )
     )
     config.format_legend(fig)
@@ -137,7 +238,11 @@ def update_trend_graph(base_date, area):
             "y": -0.35,
             "x": 1,
             "entrywidthmode": "fraction",
+            "bgcolor": "rgba(17, 24, 39, 0.75)",
+            "bordercolor": "#1f2937",
+            "borderwidth": 1,
         },
     )
+    config.apply_chart_theme(fig)
 
     return fig

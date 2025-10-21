@@ -1,7 +1,3 @@
-import dash_bootstrap_components as dbc
-from dash import dcc, html
-
-
 class Config:
     def __init__(self):
         self.target_areas = ["chubu", "kyusyu", "kansai", "tokyo"]
@@ -83,34 +79,57 @@ class Config:
             "kyusyu": "九州",
         }
 
-        self.page_paths = ["/", "/balance", "/download", "/publishapiurl", "trend"]
-        self.page_names = ["ホーム", "需給バランス", "ダウンロード", "apiurl発行", "1か月トレンド"]
-        self.sidebar = html.Div(
-            [html.H2(children="Index")]
-            + [html.Div(dcc.Link(page, href=page_path)) for page, page_path in zip(self.page_names, self.page_paths)]
-        )
-
-    def generate_side_main_layout(self, layout):
-        container = dbc.Container(
-            [
-                dbc.Row(
-                    [dbc.Col(self.sidebar, width=2), dbc.Col(layout, width=10)],
-                    style={"hegith": "100vh"},
-                )
-            ],
-            fluid=True,
-        )
-        return container
+        self.navigation = [
+            {"label": "ホーム", "path": "/", "icon": "fa-house", "id": "nav-home"},
+            {"label": "需給バランス", "path": "/balance", "icon": "fa-scale-balanced", "id": "nav-balance"},
+            {"label": "ダウンロード", "path": "/download", "icon": "fa-download", "id": "nav-download"},
+            {"label": "API URL発行", "path": "/publishapiurl", "icon": "fa-paper-plane", "id": "nav-publishapiurl"},
+            {"label": "1か月トレンド", "path": "/trend", "icon": "fa-chart-line", "id": "nav-trend"},
+        ]
 
     def format_legend(self, fig):
         fig.update_layout(
             legend={
-                "orientation": "h",  # 凡例を横に並べる
-                "entrywidth": 0.2,  # 凡例の幅(いまいちよくわからん)
+                "orientation": "h",  # 凡例を横並び
+                "entrywidth": 0.2,
                 "yanchor": "bottom",
                 "y": 1.02,
                 "xanchor": "right",
                 "x": 1,
-                "entrywidthmode": "fraction",  # 0-1で凡例の幅を決める
+                "entrywidthmode": "fraction",
+                "bgcolor": "rgba(255, 255, 255, 0.9)",
+                "bordercolor": "#e5e7eb",
+                "borderwidth": 1,
             }
+        )
+
+    def apply_chart_theme(self, fig):
+        fig.update_layout(
+            paper_bgcolor="#ffffff",
+            plot_bgcolor="#ffffff",
+            font={"color": "#111827"},
+            hovermode=False,
+            hoverlabel={"bgcolor": "#ffffff", "bordercolor": "#facc15", "font_color": "#1f2937"},
+            margin={"l": 50, "r": 30, "t": 50, "b": 40},
+            autosize=True,
+            width=None,
+        )
+        fig.update_traces(hoverinfo="skip", hovertemplate=None)
+        fig.update_xaxes(
+            showgrid=True,
+            gridcolor="#e5e7eb",
+            zeroline=False,
+            linecolor="#d1d5db",
+            tickfont={"color": "#4b5563"},
+            titlefont={"color": "#4b5563"},
+            automargin=True,
+        )
+        fig.update_yaxes(
+            showgrid=True,
+            gridcolor="#e5e7eb",
+            zeroline=False,
+            linecolor="#d1d5db",
+            tickfont={"color": "#4b5563"},
+            titlefont={"color": "#4b5563"},
+            automargin=True,
         )
