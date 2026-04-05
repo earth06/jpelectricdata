@@ -121,7 +121,6 @@ class Config:
             zeroline=False,
             linecolor="#d1d5db",
             tickfont={"color": "#4b5563"},
-            titlefont={"color": "#4b5563"},
             automargin=True,
         )
         fig.update_yaxes(
@@ -130,6 +129,5 @@ class Config:
             zeroline=False,
             linecolor="#d1d5db",
             tickfont={"color": "#4b5563"},
-            titlefont={"color": "#4b5563"},
             automargin=True,
         )
