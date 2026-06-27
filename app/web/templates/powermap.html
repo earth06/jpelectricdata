@@ -6,7 +6,6 @@
 
 {% block extra_scripts %}
   <script defer src="{{ url_for('static', path='/vendor/maplibre/maplibre-gl.js') }}"></script>
-  <script defer src="{{ url_for('static', path='/vendor/deckgl/deckgl.min.js') }}"></script>
   <script>
     window.POWERMAP_CONFIG = {{ powermap_config | tojson }};
   </script>

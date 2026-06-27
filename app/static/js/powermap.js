@@ -25,6 +25,7 @@ const mapStyle = {
 
 const queryParams = new URLSearchParams(window.location.search);
 const showPowerLayers = queryParams.get("layers") !== "base";
+const useDomFallback = queryParams.get("fallback") === "dom";
 const fallbackTileSize = 256;
 const fallbackTileUrl = "https://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png";
 
@@ -277,18 +278,6 @@ function addHover(map) {
   map.on("mouseleave", "power-substations-points", () => popup.remove());
 }
 
-function addDeckOverlay(map) {
-  if (!showPowerLayers || !window.deck?.MapboxOverlay) {
-    return;
-  }
-
-  const overlay = new deck.MapboxOverlay({
-    interleaved: false,
-    layers: []
-  });
-  map.addControl(overlay);
-}
-
 function lonLatToWorldPixel(lng, lat, zoom) {
   const scale = fallbackTileSize * 2 ** zoom;
   const sinLat = Math.sin((Math.max(Math.min(lat, 85.05112878), -85.05112878) * Math.PI) / 180);
@@ -363,7 +352,9 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   const initial = powerMapConfig.initialViewState;
-  renderFallbackBaseMap(fallbackContainer, { lng: initial.longitude, lat: initial.latitude }, initial.zoom);
+  if (useDomFallback) {
+    renderFallbackBaseMap(fallbackContainer, { lng: initial.longitude, lat: initial.latitude }, initial.zoom);
+  }
 
   const map = new maplibregl.Map({
     container: mapContainer,
@@ -371,16 +362,22 @@ document.addEventListener("DOMContentLoaded", () => {
     center: [initial.longitude, initial.latitude],
     zoom: initial.zoom,
     pitch: initial.pitch,
-    bearing: initial.bearing
+    bearing: initial.bearing,
+    dragPan: true,
+    scrollZoom: true,
+    doubleClickZoom: true,
+    touchZoomRotate: true,
+    keyboard: true
   });
 
   map.addControl(new maplibregl.NavigationControl({ showCompass: true }), "top-right");
-  addDeckOverlay(map);
-  const renderFallback = createFallbackRenderer(map, fallbackContainer);
+  const renderFallback = useDomFallback ? createFallbackRenderer(map, fallbackContainer) : null;
 
   requestAnimationFrame(() => {
     map.resize();
-    renderFallback();
+    if (renderFallback) {
+      renderFallback();
+    }
   });
 
   map.on("load", () => {
@@ -393,7 +390,9 @@ document.addEventListener("DOMContentLoaded", () => {
     addHover(map);
   });
 
-  map.on("move", renderFallback);
-  map.on("resize", renderFallback);
-  window.addEventListener("resize", renderFallback);
+  if (renderFallback) {
+    map.on("move", renderFallback);
+    map.on("resize", renderFallback);
+    window.addEventListener("resize", renderFallback);
+  }
 });

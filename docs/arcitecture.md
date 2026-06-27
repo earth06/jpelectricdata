@@ -352,26 +352,17 @@ FastAPI endpointは `records` 形式のJSONを返し、`static/js/charts.js` が
 - Tailwind、Font Awesome、Plotly.jsの外部CDNは使わない。CSS/JSは `app/static` から配信し、Plotly.jsはPythonの `plotly` パッケージに同梱される `plotly.min.js` をローカル配信する。
 
 
-## webgisページの追加
-
-* maplibre+deckglを用いて送電線マップを表示する。
-* 送電線データはdata/power.mbtilesを参照する。ここには送電線・鉄塔・発電所・変電所の情報がベクトルタイルとして格納されている。
-* タイルマップ用のエンドポイントに実装が必要になる。
-* ホバーは発電所・変電所のみ有効とする。送電線は高圧をそれ以外の送電線に対して太く描画する。鉄塔は数が非常に多いためズームレベルに応じて表示数を間引くこと
-* 送電線は管理事業がわかる場合は色分けして表示・不明な場合は灰色線とする。
-* 地図の初期位置は愛知県の名古屋駅、初期ズームレベルは10とする。
-* エンドポイントは/powermap
-
 ### webgis実装メモ
 
 - Web画面は `/powermap` として追加する。
 - タイル配信APIは `/api/v1/powermap/tilejson.json` と `/api/v1/powermap/tiles/{z}/{x}/{y}.pbf` とする。
 - `data/power.mbtiles` はMBTilesのTMS tile rowで保存されているため、APIではXYZの `y` をTMS rowへ変換して取得する。
-- MapLibre GL JSとdeck.glは `app/static/vendor/` に同梱し、外部CDNに依存しない。
-- ベースマップは国土地理院の地理院タイル pale (`https://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png`) をMapLibreのraster sourceとして表示する。MapLibreのraster描画が環境依存で空になる場合に備え、同じpaleタイルを通常の `<img>` グリッドで背面表示するフォールバックを持つ。
+- MapLibre GL JSは `app/static/vendor/` に同梱し、外部CDNに依存しない。送電線などのタイル描画はMapLibreのWebGL layerで行い、空のdeck.gl overlayは使わない。
+- ベースマップは国土地理院の地理院タイル pale (`https://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png`) をMapLibreのraster sourceとして表示する。MapLibreのraster描画が環境依存で空になる場合に備え、`?fallback=dom` 指定時のみ同じpaleタイルを通常の `<img>` グリッドで背面表示するフォールバックを持つ。
 - 地図の初期位置は名古屋駅付近 `[136.881537, 35.170915]`、初期ズームは `10` とする。
 - 送電線は `power_lines` をMapLibreのline layerで描画し、`voltage` に応じて線幅と色を変える。現行の `power_lines` には管理事業者を示す属性がなく、正確な事業者色分けにはMBTiles生成時に `operator` などの属性を保持する必要がある。
 - 鉄塔は `power_towers` をズーム12以上で表示し、MBTiles作成時のtippecanoe generalizationと表示ズーム制限により低ズームでの密度を抑える。
 - ホバーpopupは `power_plants_points`, `power_plants_polygons`, `power_substations_points`, `power_substations_polygons` のみに限定する。
+- 凡例はクリック可能なトグルとし、154kV以上、66kV以上、その他/不明、鉄塔、発電所、変電所の表示・非表示をMapLibre layer group単位で切り替える。
 
 　
