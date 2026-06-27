@@ -12,7 +12,10 @@
     <h3>ビュー設定</h3>
     <p>分析対象の期間と指標を切り替えます。</p>
     <label for="trend-base-date">基準日</label>
-    <input id="trend-base-date" type="date" min="2024-04-01" value="{{ chart_base_date }}">
+    <div class="date-control">
+      <input id="trend-base-date" type="date" min="2024-04-01" value="{{ chart_base_date }}">
+      <button class="secondary-button today-button" type="button" data-date-target="trend-base-date" data-today="{{ today }}">今日</button>
+    </div>
     <label for="trend-spot-type">スポット取引結果項目</label>
     <select id="trend-spot-type">
       <option value="price" selected>価格</option>

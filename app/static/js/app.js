@@ -11,4 +11,16 @@ document.addEventListener("DOMContentLoaded", () => {
     sidebar.classList.toggle("collapsed");
     icon.textContent = sidebar.classList.contains("collapsed") ? "›" : "‹";
   });
+
+  document.querySelectorAll(".today-button").forEach((button) => {
+    button.addEventListener("click", () => {
+      const targetId = button.dataset.dateTarget;
+      const target = document.getElementById(targetId);
+      if (!target) {
+        return;
+      }
+      target.value = button.dataset.today;
+      target.dispatchEvent(new Event("change", { bubbles: true }));
+    });
+  });
 });

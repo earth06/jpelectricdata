@@ -286,6 +286,18 @@ select:focus {
   outline: 2px solid rgba(234, 179, 8, 0.25);
 }
 
+.date-control {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.today-button {
+  min-width: 4rem;
+  white-space: nowrap;
+}
+
 .chart-stack {
   display: grid;
   gap: 1.5rem;
