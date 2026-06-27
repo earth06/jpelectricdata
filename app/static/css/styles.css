@@ -203,7 +203,7 @@ select {
 }
 
 .main-content > * {
-  width: min(100%, 72rem);
+  width: min(100%, 86.4rem);
   margin-right: auto;
   margin-left: auto;
 }
