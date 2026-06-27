@@ -6,3 +6,4 @@ if [ -e data/data.db  ];then
 fi
 
 sqlite3 ./data/data.db  < ./sql/create_detail_demand_supply.sql
+sqlite3 ./data/data.db  < ./sql/create_spot_price.sql
