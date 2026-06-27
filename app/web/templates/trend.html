@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="page-heading">
+  <span>1か月トレンド</span>
+  <h2>需給と市場価格のトレンド把握</h2>
+  <p>直近1か月の推移を俯瞰し、スポット指標と需給バランスの相関を確認します。</p>
+</section>
+
+<section class="dashboard-grid">
+  <aside class="panel settings-panel">
+    <h3>ビュー設定</h3>
+    <p>分析対象の期間と指標を切り替えます。</p>
+    <label for="trend-base-date">基準日</label>
+    <input id="trend-base-date" type="date" min="2024-04-01" value="{{ two_days_ago }}">
+    <label for="trend-spot-type">スポット取引結果項目</label>
+    <select id="trend-spot-type">
+      <option value="price" selected>価格</option>
+      <option value="block">ブロック取引量</option>
+    </select>
+    <label for="trend-area">需給バランス対象エリア</label>
+    <select id="trend-area">
+      {% for value, label in trend_area_options.items() %}
+        <option value="{{ value }}" {% if value == "chubu" %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+  </aside>
+  <div class="chart-stack">
+    <article class="panel chart-panel">
+      <div class="panel-header">
+        <h3>スポット市場</h3>
+        <span>30日間の推移</span>
+      </div>
+      <div id="trend-spot-chart" class="chart"></div>
+    </article>
+    <article class="panel chart-panel">
+      <div class="panel-header">
+        <h3>需給バランス</h3>
+        <span>積み上げ表示</span>
+      </div>
+      <div id="trend-supply-chart" class="chart tall-chart"></div>
+    </article>
+  </div>
+</section>
+{% endblock %}

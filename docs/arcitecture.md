@@ -339,3 +339,14 @@ FastAPI endpointは `records` 形式のJSONを返し、`static/js/charts.js` が
 6. Tailwind/Font Awesome/Plotly.js はCDN利用を継続しますか。本番環境で外部通信を避ける必要がある場合は静的ファイルとして同梱する設計にします。
 
 > 静的ファイルとして同梱して下さい。　
+
+## 移行実装メモ
+
+回答方針に従い、FastAPI移行では次の設計で実装する。
+
+- グラフAPIは案Aを採用し、FastAPIがPlotly Figure JSONを返す。
+- 旧 `/api?begin=YYYYMMDD&end=YYYYMMDD` は作らず、`/api/v1/spot-prices?begin=YYYY-MM-DD&end=YYYY-MM-DD` に統合する。
+- 旧Dash画面の未接続「予測対象エリア」Checklistは削除する。
+- CSV出力は `/api/v1/export/spot-prices.csv` のサーバー側CSV endpointとして提供する。
+- DBアクセスはSQLite継続、実装はSQLAlchemy Coreを使う。
+- Tailwind、Font Awesome、Plotly.jsの外部CDNは使わない。CSS/JSは `app/static` から配信し、Plotly.jsはPythonの `plotly` パッケージに同梱される `plotly.min.js` をローカル配信する。
