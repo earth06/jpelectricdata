@@ -82,6 +82,7 @@ FastAPI版の画面は次のパスで提供します。
 /download
 /publishapiurl
 /trend
+/powermap
 ```
 
 スポット価格APIとCSVエクスポートは次のエンドポイントです。
@@ -89,6 +90,13 @@ FastAPI版の画面は次のパスで提供します。
 ```text
 /api/v1/spot-prices?begin=YYYY-MM-DD&end=YYYY-MM-DD
 /api/v1/export/spot-prices.csv?begin=YYYY-MM-DD&end=YYYY-MM-DD
+```
+
+送電線マップのベクトルタイルAPIは次のエンドポイントです。
+
+```text
+/api/v1/powermap/tilejson.json
+/api/v1/powermap/tiles/{z}/{x}/{y}.pbf
 ```
 
 ## License

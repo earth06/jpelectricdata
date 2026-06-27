@@ -141,6 +141,10 @@ select {
   content: "T";
 }
 
+.nav-icon[data-icon="map"]::before {
+  content: "M";
+}
+
 .content-wrapper {
   display: flex;
   flex: 1;
@@ -436,6 +440,137 @@ th {
   color: #854d0e;
 }
 
+body[data-page="powermap"] .main-content {
+  padding: 0;
+}
+
+body[data-page="powermap"] .main-content > * {
+  width: 100%;
+  max-width: none;
+}
+
+.powermap-page {
+  position: relative;
+  height: calc(100vh - 73px);
+  min-height: 36rem;
+  background: #eef2f3;
+}
+
+.powermap-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: transparent;
+}
+
+.powermap-fallback {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  background: #eef2f3;
+}
+
+.powermap-fallback img {
+  position: absolute;
+  width: 256px;
+  height: 256px;
+  user-select: none;
+  pointer-events: none;
+}
+
+.powermap-legend {
+  position: absolute;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 3;
+  display: grid;
+  gap: 0.45rem;
+  min-width: 9rem;
+  border: 1px solid rgba(209, 213, 219, 0.9);
+  border-radius: 0.5rem;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.12);
+  padding: 0.75rem;
+  color: #1f2937;
+  font-size: 0.8rem;
+}
+
+.legend-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  border: 0;
+  background: transparent;
+  padding: 0.2rem 0;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.legend-toggle[aria-pressed="false"] {
+  opacity: 0.42;
+}
+
+.legend-toggle[aria-pressed="false"] .legend-line,
+.legend-toggle[aria-pressed="false"] .legend-dot {
+  filter: grayscale(1);
+}
+
+.legend-toggle:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+.legend-line {
+  display: inline-block;
+  width: 1.75rem;
+  height: 0.25rem;
+  border-radius: 999px;
+}
+
+.legend-dot {
+  display: inline-block;
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 999px;
+}
+
+.legend-high-voltage {
+  background: #dc2626;
+}
+
+.legend-mid-voltage {
+  background: #2563eb;
+}
+
+.legend-unknown {
+  background: #6b7280;
+}
+
+.legend-tower {
+  border: 1px solid #111827;
+  background: #111827;
+}
+
+.legend-plant {
+  border: 1px solid #854d0e;
+  background: #facc15;
+}
+
+.legend-substation {
+  border: 1px solid #075985;
+  background: #38bdf8;
+}
+
+.maplibregl-popup-content {
+  border: 1px solid rgba(209, 213, 219, 0.9);
+  border-radius: 0.5rem;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.16);
+  color: #111827;
+  font-size: 0.82rem;
+}
+
 @media (max-width: 900px) {
   .app-shell {
     display: block;
@@ -459,5 +594,9 @@ th {
   .dashboard-grid,
   .form-row {
     grid-template-columns: 1fr;
+  }
+
+  .powermap-page {
+    height: 70vh;
   }
 }
