@@ -59,3 +59,20 @@ def download(request: Request):
 def publish_api_url(request: Request):
     """Render the API URL generator page."""
     return templates.TemplateResponse(request, "publishapiurl.html", _context(request, "publishapiurl", "API URL発行"))
+
+
+@router.get("/powermap")
+def powermap(request: Request):
+    """Render the power transmission WebGIS page."""
+    context = _context(request, "powermap", "送電線マップ")
+    context["powermap_config"] = {
+        "tileJsonUrl": "/api/v1/powermap/tilejson.json",
+        "initialViewState": {
+            "longitude": 136.881537,
+            "latitude": 35.170915,
+            "zoom": 10,
+            "pitch": 0,
+            "bearing": 0,
+        },
+    }
+    return templates.TemplateResponse(request, "powermap.html", context)

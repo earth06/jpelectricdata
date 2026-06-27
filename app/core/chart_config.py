@@ -86,6 +86,7 @@ NAVIGATION = [
     {"label": "ダウンロード", "path": "/download", "icon": "download"},
     {"label": "API URL発行", "path": "/publishapiurl", "icon": "api"},
     {"label": "1か月トレンド", "path": "/trend", "icon": "trend"},
+    {"label": "送電線マップ", "path": "/powermap", "icon": "map"},
 ]
 
 SPOT_BLOCK_COLUMNS = [
