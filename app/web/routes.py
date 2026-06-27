@@ -5,6 +5,7 @@ from fastapi import APIRouter, Request
 from fastapi.templating import Jinja2Templates
 
 from app.core.chart_config import AREA_JP_NAMES, DEMAND_SUPPLY_JP_NAMES, NAVIGATION, TREND_AREA_JP_NAMES
+from app.services.electric_service import electric_service
 
 router = APIRouter()
 templates = Jinja2Templates(directory="app/web/templates")
@@ -13,13 +14,15 @@ templates = Jinja2Templates(directory="app/web/templates")
 def _context(request: Request, page: str, title: str) -> dict:
     """Return common template context for dashboard pages."""
     today = datetime.now(tz=ZoneInfo("Asia/Tokyo")).date()
+    chart_base_date = electric_service.latest_chart_base_date() or today
     return {
         "request": request,
         "page": page,
         "title": title,
         "navigation": NAVIGATION,
         "today": today.isoformat(),
-        "two_days_ago": (today - timedelta(days=2)).isoformat(),
+        "chart_base_date": chart_base_date.isoformat(),
+        "two_days_before_chart_base": (chart_base_date - timedelta(days=2)).isoformat(),
         "default_start": date(2024, 12, 1).isoformat(),
         "default_end": date(2024, 12, 7).isoformat(),
         "demand_supply_options": DEMAND_SUPPLY_JP_NAMES,

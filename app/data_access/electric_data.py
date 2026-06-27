@@ -3,6 +3,7 @@ from typing import Any
 
 from sqlalchemy import Column, Float, Integer, MetaData, String, Table, select
 from sqlalchemy.engine import Engine
+from sqlalchemy.sql import func
 
 from app.core.chart_config import DEMAND_SUPPLY_NAMES
 from app.db.session import engine
@@ -123,3 +124,28 @@ class ElectricDataAccess:
             statement = statement.where(detail_demand_supply.c.area_name == area)
         with self.engine.connect() as connection:
             return [dict(row) for row in connection.execute(statement).mappings()]
+
+    def latest_demand_supply_date(self) -> date | None:
+        """Return the latest date available in the demand/supply table."""
+        return self._latest_date(detail_demand_supply)
+
+    def latest_common_chart_date(self) -> date | None:
+        """Return the latest date available in both chart source tables."""
+        spot_day = func.substr(spot_price.c.date_time, 1, 10)
+        demand_day = func.substr(detail_demand_supply.c.date_time, 1, 10)
+        demand_days = select(demand_day).distinct()
+        statement = select(func.max(spot_day)).where(spot_day.in_(demand_days))
+        with self.engine.connect() as connection:
+            latest = connection.execute(statement).scalar_one_or_none()
+        if latest is None:
+            return None
+        return date.fromisoformat(latest)
+
+    def _latest_date(self, table: Table) -> date | None:
+        """Return the latest date part from a table with a date_time column."""
+        statement = select(func.max(table.c.date_time))
+        with self.engine.connect() as connection:
+            latest = connection.execute(statement).scalar_one_or_none()
+        if latest is None:
+            return None
+        return date.fromisoformat(latest[:10])

@@ -45,6 +45,7 @@ class ChartService:
             raise ValueError(msg)
         begin, end = self.service.chart_range(base_date, 7)
         demand_frame = self.service.demand_supply_frame(begin, end)
+        demand_frame = self._ensure_columns(demand_frame, ["date_time", "area_name", field])
         fig = px.line(demand_frame, x="date_time", y=field, color="area_name")
         format_legend(fig)
         apply_chart_theme(fig)

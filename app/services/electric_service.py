@@ -102,6 +102,10 @@ class ElectricService:
         """Return the begin/end dates used by the old Dash chart callbacks."""
         return base_date - timedelta(days=days), base_date
 
+    def latest_chart_base_date(self) -> date | None:
+        """Return the latest base date that can render both spot and demand charts."""
+        return self.data_access.latest_common_chart_date() or self.data_access.latest_demand_supply_date()
+
     def spot_price_frame(
         self,
         begin: date,

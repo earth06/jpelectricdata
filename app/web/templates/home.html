@@ -12,7 +12,7 @@
     <h3>ビュー設定</h3>
     <p>対象期間と需給項目を切り替えて表示をカスタマイズします。</p>
     <label for="home-base-date">推論実行日</label>
-    <input id="home-base-date" type="date" min="2024-04-01" value="{{ today }}">
+    <input id="home-base-date" type="date" min="2024-04-01" value="{{ chart_base_date }}">
     <label for="home-demand-field">需給項目</label>
     <select id="home-demand-field">
       {% for value, label in demand_supply_options.items() %}
