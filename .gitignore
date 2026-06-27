@@ -5,3 +5,5 @@ data/*.zip
 **/__pycache__
 src/bin/chromedriver
 app/app.log
+*.ipynb
+*.env
