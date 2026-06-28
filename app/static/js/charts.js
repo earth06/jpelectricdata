@@ -26,15 +26,21 @@ async function drawChart(elementId, url) {
   if (!element) {
     return;
   }
+  const hasPlot = Boolean(element._fullLayout);
   element.classList.add("loading");
-  element.textContent = "Loading...";
+  if (!hasPlot) {
+    element.textContent = "Loading...";
+  }
   try {
     const payload = await fetchJson(url);
     const figure = payload.figure || {};
-    element.textContent = "";
+    if (!element._fullLayout) {
+      element.textContent = "";
+    }
     await Plotly.react(element, figure.data || [], figure.layout || {}, chartConfig);
   } catch (error) {
     Plotly.purge(element);
+    element.replaceChildren();
     element.textContent = error.message;
   } finally {
     element.classList.remove("loading");
