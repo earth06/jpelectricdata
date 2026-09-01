@@ -366,7 +366,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     if args.file is None:
         # elec = ElectricData(args.date, set_chromdriver=args.set_chromedirver)
-        elec = ElectricData(args.date, set_chromedriver=True)
+        elec = ElectricData(args.date, set_chromedriver=False)
         elec.execute()
     else:
         elec = ElectricData()
