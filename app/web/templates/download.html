@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="page-heading">
+  <span>データダウンロード</span>
+  <h2>任意期間のスポット価格をダウンロード</h2>
+  <p>期間を指定してスポット価格データを抽出し、CSVで出力できます。</p>
+</section>
+
+<section class="dashboard-grid">
+  <aside class="panel settings-panel">
+    <h3>抽出条件</h3>
+    <p>開始日と終了日を入力し、表示ボタンからデータを読み込みます。</p>
+    <div class="form-row">
+      <div>
+        <label for="download-start-date">開始日</label>
+        <input id="download-start-date" type="date" value="{{ default_start }}">
+      </div>
+      <div>
+        <label for="download-end-date">終了日</label>
+        <input id="download-end-date" type="date" value="{{ default_end }}">
+      </div>
+    </div>
+    <div class="button-row">
+      <button id="download-load-button" class="primary-button" type="button">表示</button>
+      <a id="download-csv-link" class="secondary-button" href="/api/v1/export/spot-prices.csv?begin={{ default_start }}&end={{ default_end }}">CSV</a>
+    </div>
+  </aside>
+  <article class="panel table-panel">
+    <div class="panel-header">
+      <h3>取得データプレビュー</h3>
+      <span>サーバー側CSV対応</span>
+    </div>
+    <div id="download-table-container" class="table-container">期間を選択し、表示ボタンを押してください。</div>
+  </article>
+</section>
+{% endblock %}

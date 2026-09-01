@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block extra_head %}
+  <link rel="stylesheet" href="{{ url_for('static', path='/vendor/maplibre/maplibre-gl.css') }}">
+{% endblock %}
+
+{% block extra_scripts %}
+  <script defer src="{{ url_for('static', path='/vendor/maplibre/maplibre-gl.js') }}"></script>
+  <script>
+    window.POWERMAP_CONFIG = {{ powermap_config | tojson }};
+  </script>
+  <script defer src="{{ url_for('static', path='/js/powermap.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+<section class="powermap-page">
+  <div id="powermap-fallback" class="powermap-fallback" aria-hidden="true"></div>
+  <div id="powermap" class="powermap-canvas"></div>
+  <div class="powermap-legend" aria-label="送電線凡例">
+    <button type="button" class="legend-toggle" data-layer-group="high-voltage" aria-pressed="true">
+      <span class="legend-line legend-high-voltage"></span>154kV以上
+    </button>
+    <button type="button" class="legend-toggle" data-layer-group="mid-voltage" aria-pressed="true">
+      <span class="legend-line legend-mid-voltage"></span>66kV以上
+    </button>
+    <button type="button" class="legend-toggle" data-layer-group="other-lines" aria-pressed="true">
+      <span class="legend-line legend-unknown"></span>その他/不明
+    </button>
+    <button type="button" class="legend-toggle" data-layer-group="towers" aria-pressed="true">
+      <span class="legend-dot legend-tower"></span>鉄塔
+    </button>
+    <button type="button" class="legend-toggle" data-layer-group="plants" aria-pressed="true">
+      <span class="legend-dot legend-plant"></span>発電所
+    </button>
+    <button type="button" class="legend-toggle" data-layer-group="substations" aria-pressed="true">
+      <span class="legend-dot legend-substation"></span>変電所
+    </button>
+  </div>
+</section>
+{% endblock %}

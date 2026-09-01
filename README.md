@@ -70,8 +70,33 @@ fig,ax=anal.plot_all_demand_supply()
 5. ダッシュボードの起動
 
 ```bash
-cd jpelectricdata/app
-python app.py  --host <your host> --port <your port>
+cd jpelectricdata
+uv run uvicorn app.main:app --host <your host> --port <your port>
+```
+
+FastAPI版の画面は次のパスで提供します。
+
+```text
+/
+/balance
+/download
+/publishapiurl
+/trend
+/powermap
+```
+
+スポット価格APIとCSVエクスポートは次のエンドポイントです。
+
+```text
+/api/v1/spot-prices?begin=YYYY-MM-DD&end=YYYY-MM-DD
+/api/v1/export/spot-prices.csv?begin=YYYY-MM-DD&end=YYYY-MM-DD
+```
+
+送電線マップのベクトルタイルAPIは次のエンドポイントです。
+
+```text
+/api/v1/powermap/tilejson.json
+/api/v1/powermap/tiles/{z}/{x}/{y}.pbf
 ```
 
 ## License
@@ -81,4 +106,3 @@ python app.py  --host <your host> --port <your port>
 ## 連絡先
 
 nnnkjktkt119@gmail.com
-

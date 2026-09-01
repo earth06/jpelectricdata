@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="page-heading">
+  <span>ホーム</span>
+  <h2>市場価格と全エリアの需給</h2>
+  <p>直近の推論実行日を基点に、スポット市場価格と需給実績を横断的に確認できます。</p>
+</section>
+
+<section class="dashboard-grid">
+  <aside class="panel settings-panel">
+    <h3>ビュー設定</h3>
+    <p>対象期間と需給項目を切り替えて表示をカスタマイズします。</p>
+    <label for="home-base-date">推論実行日</label>
+    <div class="date-control">
+      <input id="home-base-date" type="date" min="2024-04-01" value="{{ chart_base_date }}">
+      <button class="secondary-button today-button" type="button" data-date-target="home-base-date" data-today="{{ today }}">今日</button>
+    </div>
+    <label for="home-demand-field">需給項目</label>
+    <select id="home-demand-field">
+      {% for value, label in demand_supply_options.items() %}
+        <option value="{{ value }}" {% if value == "area_demand" %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+  </aside>
+  <div class="chart-stack">
+    <article class="panel chart-panel">
+      <div class="panel-header">
+        <h3>スポット市場価格</h3>
+        <span>単位: 円/kWh</span>
+      </div>
+      <div id="home-price-chart" class="chart"></div>
+    </article>
+    <article class="panel chart-panel">
+      <div class="panel-header">
+        <h3>需給実績</h3>
+        <span>エリア別の時系列</span>
+      </div>
+      <div id="home-demand-chart" class="chart"></div>
+    </article>
+  </div>
+</section>
+{% endblock %}

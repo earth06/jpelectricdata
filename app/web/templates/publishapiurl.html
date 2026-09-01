@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="page-heading">
+  <span>API発行</span>
+  <h2>指定期間のAPI URLを生成</h2>
+  <p>APIに渡す期間パラメータをGUIから生成し、即座に共有できます。</p>
+</section>
+
+<section class="dashboard-grid">
+  <aside class="panel settings-panel">
+    <h3>パラメータ設定</h3>
+    <p>開始日と終了日を指定し、API URL を生成します。</p>
+    <div class="form-row">
+      <div>
+        <label for="api-start-date">開始日</label>
+        <input id="api-start-date" type="date" value="{{ default_start }}">
+      </div>
+      <div>
+        <label for="api-end-date">終了日</label>
+        <input id="api-end-date" type="date" value="{{ default_end }}">
+      </div>
+    </div>
+    <div class="button-row">
+      <button id="api-url-button" class="primary-button" type="button">URL生成</button>
+    </div>
+  </aside>
+  <article class="panel">
+    <div class="panel-header">
+      <h3>生成されたURL</h3>
+      <span>コピーして共有</span>
+    </div>
+    <div id="api-url-container" class="api-url-box">期間を選択し、URL生成ボタンを押してください。</div>
+  </article>
+</section>
+{% endblock %}
