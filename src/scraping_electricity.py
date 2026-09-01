@@ -1,19 +1,20 @@
+import argparse
+import glob
+import os
+import sqlite3
 import traceback
 import zipfile
+from datetime import datetime
+from pathlib import Path
+from time import sleep
+
 import pandas as pd
 import requests
-import os
-from time import sleep
-from datetime import datetime
+import yaml
+import yaml.scanner
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
-from pathlib import Path
-import yaml
-import yaml.scanner
-import glob
-import argparse
-import sqlite3
 
 ROOTDIR = f"{os.path.dirname(__file__)}/.."
 
@@ -52,7 +53,7 @@ class ElectricData:
             "shikoku": "08",
             "kyusyu": "09",
         }
-        with open(f"{ROOTDIR}/src/detail_demand_supply_master.yml", "tr") as f:
+        with open(f"{ROOTDIR}/src/detail_demand_supply_master.yml") as f:
             self.config = yaml.safe_load(f)
         self.service = (
             Service(executable_path=f"{ROOTDIR}/src/bin/chromedriver")
@@ -83,7 +84,7 @@ class ElectricData:
                 data = res.content.decode(encoding=encoding)
                 filename = os.path.basename(url)
                 filepath = f"{self.OUTDIR}/{filename}"
-                with open(filepath, "wt", encoding=encoding) as f:
+                with open(filepath, "w", encoding=encoding) as f:
                     f.write(data)
                 print("success")
                 return filepath
@@ -188,7 +189,7 @@ class ElectricData:
         return filepath
 
     def load_with_check(
-        self, filepath, area_name, encoding, skiprows=1, sel_columns=False
+        self, filepath, area_name, encoding, skiprows=1, sel_columns=False,
     ):
         df = pd.read_csv(filepath, encoding=encoding, skiprows=skiprows)
         org_cols = self.config["original_columns"][area_name]
@@ -199,18 +200,17 @@ class ElectricData:
         if col_check == 20:
             df.columns = self.config["common_columns"]
             return df
-        else:
-            print("original:", org_cols, "current:", df.columns)
-            raise
+        print("original:", org_cols, "current:", df.columns)
+        raise
         return None
 
     def load_hokkaido(self, filepath):
         df = self.load_with_check(
-            filepath, "hokkaido", encoding="shift-jis", skiprows=2
+            filepath, "hokkaido", encoding="shift-jis", skiprows=2,
         ).loc[1:]
         df["TIME"] = df["TIME"].str.split("〜").apply(lambda x: x[0])
         df["date_time"] = pd.to_datetime(
-            df["DATE"] + " " + df["TIME"], format="%Y/%m/%d %H:%M"
+            df["DATE"] + " " + df["TIME"], format="%Y/%m/%d %H:%M",
         )
         df["area_name"] = "hokkaido"
         return df
@@ -241,7 +241,7 @@ class ElectricData:
 
     def load_chugoku(self, filepath):
         df = self.load_with_check(
-            filepath, "chugoku", encoding="shift-jis", sel_columns=True
+            filepath, "chugoku", encoding="shift-jis", sel_columns=True,
         )
         df["date_time"] = pd.to_datetime(df["DATE"] + " " + df["TIME"])
         df["area_name"] = "chugoku"
@@ -261,7 +261,7 @@ class ElectricData:
         df.loc[idx_24h, "date"] = df.loc[idx_24h, "date"] + pd.offsets.Day(1)
         df.loc[idx_24h, "TIME"] = "00:00"
         df["date_time"] = pd.to_datetime(
-            df["date"].dt.strftime("%Y-%m-%d") + " " + df["TIME"]
+            df["date"].dt.strftime("%Y-%m-%d") + " " + df["TIME"],
         )
         # おそらく九州電力だけ前30分を見ているので、他と合わせるために30分戻す
         df["date_time"] = df["date_time"] - pd.offsets.Minute(30)
@@ -277,7 +277,7 @@ class ElectricData:
                 for filename in filelist:
                     with zf.open(filename) as f:
                         df_list.append(
-                            self.load_with_check(f, "tohoku", encoding="shift-jis")
+                            self.load_with_check(f, "tohoku", encoding="shift-jis"),
                         )
             df = pd.concat(df_list)
         else:
@@ -354,7 +354,7 @@ class ElectricData:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--date", help="取得する月,指定がなければ当月を設定する('yyyy-mm')"
+        "--date", help="取得する月,指定がなければ当月を設定する('yyyy-mm')",
     )
     parser.add_argument(
         "--file",

@@ -1,11 +1,12 @@
-import matplotlib.pyplot as plt
-import sqlite3
-import pandas as pd
-from datetime import datetime, timedelta
-import os
-import numpy as np
-import matplotlib.patches as mpatches
 import argparse
+import os
+import sqlite3
+from datetime import datetime, timedelta
+
+import matplotlib.patches as mpatches
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 
 plt.style.use("ggplot")
 
@@ -86,7 +87,7 @@ class ElectricAnalysis:
         ]
 
     def load_demand_supply(
-        self, begin: str = None, end: str = None, ignore_negative_value=True
+        self, begin: str = None, end: str = None, ignore_negative_value=True,
     ):
         if begin is None:
             begin = (datetime.today() - timedelta(days=1)).strftime("%Y-%m-%d 00:00:00")
@@ -102,10 +103,9 @@ class ElectricAnalysis:
         self.df_demand = pd.read_sql(sql, conn, parse_dates=["date_time"])
         if ignore_negative_value:
             self.df_demand[self.labels] = self.df_demand[self.labels].where(
-                self.df_demand[self.labels] >= 0, 0
+                self.df_demand[self.labels] >= 0, 0,
             )
         conn.close()
-        return
 
     def load_spot_price(self, begin: str = None, end: str = None):
         if begin is None:
@@ -121,10 +121,9 @@ class ElectricAnalysis:
         """
         self.df_jepx = pd.read_sql(sql, conn, parse_dates=["date_time"])
         conn.close()
-        return
 
     def plot_demand_supply(
-        self, area_name="chubu", figsize=(18, 8), legend=True, alpha=1
+        self, area_name="chubu", figsize=(18, 8), legend=True, alpha=1,
     ):
         fig, ax = plt.subplots(figsize=figsize)
         tmp = self.df_demand.query(f"area_name=='{area_name}'").copy()
@@ -136,7 +135,7 @@ class ElectricAnalysis:
             inplace=True,
         )
         tmp[self.jplabels].plot(
-            kind="area", color=self.colors, ax=ax, legend=False, alpha=alpha
+            kind="area", color=self.colors, ax=ax, legend=False, alpha=alpha,
         )
         tmp["area_demand"].plot(c="r", ax=ax, legend=False, marker=".")
         # 右上
@@ -161,7 +160,7 @@ class ElectricAnalysis:
                 inplace=True,
             )
             tmp[self.jplabels].plot(
-                kind="area", color=self.colors, ax=ax[i], legend=False, alpha=0.8
+                kind="area", color=self.colors, ax=ax[i], legend=False, alpha=0.8,
             )
             tmp["area_demand"].plot(c="k", ax=ax[i], legend=False)
             ax[i].set_xlabel("")
@@ -180,13 +179,13 @@ class ElectricAnalysis:
             for color, label in zip(self.colors, self.labels)
         ]
         fig.legend(
-            handles=patches, loc="upper left", bbox_to_anchor=(0.9, 0.8, 0.2, 0.1)
+            handles=patches, loc="upper left", bbox_to_anchor=(0.9, 0.8, 0.2, 0.1),
         )
         fig.suptitle("エリア需給実績速報値")
         fig.subplots_adjust(hspace=0.25)
         if save:
             fig.savefig(
-                f"{ROOTDIR}/example/all_area_demand_supply.jpg", bbox_inches="tight"
+                f"{ROOTDIR}/example/all_area_demand_supply.jpg", bbox_inches="tight",
             )
         return fig, ax
 

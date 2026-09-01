@@ -1,16 +1,17 @@
-import pandas as pd
-import sqlite3
-import os
-import yaml
 import argparse
+import os
+import sqlite3
 from datetime import datetime
+
+import pandas as pd
+import yaml
 
 ROOTDIR = f"{os.path.dirname(__file__)}/.."  # noqa
 
 
 class JEPXData:
     def __init__(self):
-        with open(f"{ROOTDIR}/src/detail_demand_supply_master.yml", "tr") as f:
+        with open(f"{ROOTDIR}/src/detail_demand_supply_master.yml") as f:
             self.config = yaml.safe_load(f)
         self.org_columns = self.config["original_columns"]["spot_columns"]
 
@@ -35,22 +36,21 @@ class JEPXData:
         diff = df.columns.difference(self.org_columns)
         if len(diff) > 0:
             raise
-        else:
-            # date_time列を定義
-            timecode2time = {i + 1: f"{i//2:02d}:{(i%2)*30:02d}" for i in range(48)}
-            df["time"] = df["時刻コード"].apply(lambda x: timecode2time[x])
-            df["年月日"] = pd.to_datetime(df["年月日"] + " " + df["time"])
-            # カラムをrename
-            jp2en = {
-                jp: en
-                for jp, en in zip(
-                    self.config["original_columns"]["spot_columns"],
-                    self.config["spot_columns"],
-                )
-            }
-            # 整形したdfを返す
-            df_fmt = df.rename(columns=jp2en).drop(columns="time")
-            return df_fmt
+        # date_time列を定義
+        timecode2time = {i + 1: f"{i//2:02d}:{(i%2)*30:02d}" for i in range(48)}
+        df["time"] = df["時刻コード"].apply(lambda x: timecode2time[x])
+        df["年月日"] = pd.to_datetime(df["年月日"] + " " + df["time"])
+        # カラムをrename
+        jp2en = {
+            jp: en
+            for jp, en in zip(
+                self.config["original_columns"]["spot_columns"],
+                self.config["spot_columns"],
+            )
+        }
+        # 整形したdfを返す
+        df_fmt = df.rename(columns=jp2en).drop(columns="time")
+        return df_fmt
 
     def get_jepx_spot_price(self, year=None):
         if year is None:
@@ -60,7 +60,7 @@ class JEPXData:
             else:
                 year = today.year
         df = pd.read_csv(
-            f"http://www.jepx.jp/market/excel/spot_{year}.csv", encoding="shift-jis"
+            f"http://www.jepx.jp/market/excel/spot_{year}.csv", encoding="shift-jis",
         )
         df = df[self.org_columns].copy()
         return df
